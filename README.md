@@ -64,7 +64,7 @@ The project structure is clean, the interfaces are well-documented, and the type
 
 ## What Makes Metathin Different?
 
-### 🧠 Memory Built-in, Not Bolted-on
+###  Memory Built-in, Not Bolted-on
 Most frameworks treat memory as an afterthought. In Metathin, it's built into the core from day one.
 
 Every agent comes with a complete memory system:
@@ -74,6 +74,18 @@ Every agent comes with a complete memory system:
 - **Every component can use it**: Behaviors can remember outcomes, Selectors can recall past fitness, Learning mechanisms can store experiences
 
 *Chaos prediction needs to remember the past to forecast the future. Your agents already do, without you writing a single line of storage code.*
+
+###  RL-ready, but not RL-only
+The five-tuple structure maps naturally to reinforcement learning:
+- P = state representation
+- B = action space  
+- S = value function
+- D = policy
+- Ψ = update rule
+
+But swap in a supervised Selector and a gradient-based Learner, and you're doing supervised learning. Swap in Hebbian learning with no expected output, and you're doing unsupervised learning.
+
+**Same architecture. Different components. Three paradigms.**
 
 ---
 
@@ -235,6 +247,12 @@ Create `metathin_plus.climate`:
 - ✅ Memory system (JSON/SQLite/in-memory backends, TTL, LRU)
 - ✅ Chaos prediction module
 - ✅ Scientific discovery module
+
+**Under the hood, Metathin already supports:**
+- ✅ Supervised learning (via `GradientLearning` + `expected`)
+- ✅ Unsupervised learning (via `HebbianLearning`)
+- ✅ Reinforcement learning (via `RewardLearning` + exploration strategies)
+- ✅ Time series forecasting (with built-in memory for history)
 
 **What's in progress:**
 - ⚠️ API might be tweaked based on feedback
