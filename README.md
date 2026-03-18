@@ -1,1 +1,285 @@
-# Metathin-Release
+# Metathin
+
+**A Meta-cognitive Agent System Construction Framework**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Lydian-Zhu/Metathin-Release/pulls)
+
+---
+
+## What is Metathin?
+
+Metathin is a framework for building cognitive agents based on a five-tuple structure `(P, B, S, D, Ψ)`. It provides a clean, modular, and extensible foundation for creating intelligent systems.
+
+**Design Philosophy:**  
+- **Fixed Interface, Free Implementation** – You bring your own algorithms  
+- **Modular & Composable** – Plug and play components  
+- **Type Safe & Observable** – Built with type hints and full logging
+
+I started this project for my physics experiment data processing, and later realized it could become something more general. Now it's here, hope it helps.
+
+---
+
+## The Core Idea
+
+No matter what kind of agent you're building—a chatbot, a lab assistant, or a prediction model—its thinking process can be described with five elements:
+
+```
+Metathin = (P, B, S, D, Ψ)
+```
+
+- **P (PatternSpace)** – Perception: turns raw input into feature vectors  
+- **B (MetaBehavior)** – Action: executable skill units  
+- **S (Selector)** – Evaluation: computes how suitable each behavior is  
+- **D (DecisionStrategy)** – Decision: picks the best behavior  
+- **Ψ (LearningMechanism)** – Learning: adjusts parameters from feedback  
+
+This abstraction doesn't care about what AI technology you use underneath. It just works.
+
+---
+
+## Built-in Components? Optional.
+
+Metathin comes with 20+ pre-built components (`SimplePatternSpace`, `MaxFitnessStrategy`, `GradientLearning`...). **But you don't have to use them.**
+
+The framework's real value is in the **interfaces**:
+
+```python
+from metathin.core import PatternSpace, MetaBehavior, Selector, DecisionStrategy, LearningMechanism
+```
+
+You can:
+- Use what I provide (quick start)
+- Implement your own algorithms (full control)
+- Mix and match (bring your own Selector, use my Behaviors)
+
+**The interfaces are designed to be minimal and flexible.** They don't force you into any specific implementation. You bring your domain expertise, the framework handles the orchestration.
+
+### AI? Feel Free to Ask It
+
+The project structure is clean, the interfaces are well-documented, and the type hints are everywhere. If you paste this code into an AI assistant and say *"Help me implement a custom Selector for my problem"*, it'll probably know what to do. I've designed it that way on purpose.
+
+---
+
+## Quick Start
+
+```python
+from metathin import Metathin
+from metathin.components import SimplePatternSpace, FunctionBehavior
+from metathin.components import MaxFitnessStrategy
+
+# Define behaviors (note: **kwargs captures all extra parameters)
+greet = FunctionBehavior("greet", lambda f,**k: "Hello! I'm an agent, how can I help?")
+echo = FunctionBehavior("echo", lambda f,**k: f"You just said: {k.get('user_input', '')}")
+
+# Create agent
+agent = Metathin(
+    pattern_space=SimplePatternSpace(lambda x: [len(x)]),
+    decision_strategy=MaxFitnessStrategy(),
+    name="SimpleAgent"
+)
+
+agent.register_behaviors([greet, echo])
+
+# Let's chat
+print("Agent started, type 'quit' to exit")
+while True:
+    user_input = input("\nYou: ")
+    if user_input.lower() == 'quit':
+        break
+    
+    response = agent.think(user_input, user_input=user_input)
+    print(f"Agent: {response}")
+```
+
+Run it. It works.
+
+---
+
+## Project Structure
+
+```
+metathin/           # Core framework (stable)
+├── core/          # Five-element interfaces and main class
+└── components/    # Built-in implementations
+
+metathin_plus/      # Domain extensions – THIS IS WHERE YOU COME IN
+├── chaos/         # Chaos theory & nonlinear dynamics (physics/math)
+├── sci/           # Scientific discovery (chemistry/biology)
+└── ...            # YOUR MODULE HERE
+```
+
+**`metathin_plus` is designed to be community-driven.** If you work in a specific domain, you can add your own module and share it with everyone.
+
+---
+
+## Built-in Modules (To Get You Started)
+
+### Chaos Prediction (`metathin_plus.chaos`)
+For nonlinear time series and dynamical systems:
+- Lyapunov exponent estimation
+- Correlation dimension
+- Multiple predictors (phase space, Volterra, neural, spectral)
+- Full vs simplified versions for comparison
+
+*Perfect if you're into physics, math, or any field with complex dynamics.*
+
+### Scientific Discovery (`metathin_plus.sci`)
+For finding patterns and laws from data:
+- Symbolic regression engine
+- Feature extraction (30+ features)
+- Similarity matching with pre-trained function libraries
+- Adaptive extrapolation
+
+*If you work with experimental data—chemistry, biology, materials science—this might save you time.*
+
+---
+
+## The Sci Module? Also Customizable
+
+`metathin_plus.sci` follows the same philosophy:
+
+- Use the built-in function generator, feature extractor, and similarity matcher
+- OR implement your own discovery algorithms
+- OR extend the existing ones
+
+The memory system (`FunctionMemoryBank`) is pluggable. The extrapolator is adaptable. Nothing is locked down.
+
+**This is your framework. Use it how you want.**
+
+---
+
+## This is Where You Come In
+
+Metathin's core is intentionally minimal. The real power comes from **you** adding modules for your own field.
+
+### If You're in Physics
+Add to `metathin_plus.chaos`:
+- New chaotic systems (Lorenz, Rossler, Duffing...)
+- Better prediction algorithms
+- Analysis tools (Lyapunov, dimension, entropy...)
+
+### If You're in Chemistry/Biology
+Add to `metathin_plus.sci`:
+- Reaction kinetics functions
+- Population dynamics models
+- Pattern discovery examples from your own data
+
+### If You're in Economics
+Create `metathin_plus.econ`:
+- Market prediction models
+- Agent-based economic simulations
+- Time series forecasting for financial data
+
+### If You're in Neuroscience
+Create `metathin_plus.neuro`:
+- Neural spike train analysis
+- Brain-computer interface components
+- Cognitive modeling tools
+
+### If You're in Climate Science
+Create `metathin_plus.climate`:
+- Weather prediction models
+- Climate pattern analysis
+- Ensemble forecasting
+
+**You get the idea.** Any domain that involves data, patterns, and decision-making can build on Metathin.
+
+---
+
+## Why Contribute?
+
+- **Your work gets used** – by researchers, students, and practitioners in your field
+- **You stand on shoulders** – the core framework handles the boring stuff, you focus on domain logic
+- **It's good for your CV** – open source contributions matter
+- **It's actually fun** – seeing your code help other people is satisfying
+
+---
+
+## How to Add Your Own Module
+
+1. Fork the repo
+2. Create `metathin_plus/your_module/`
+3. Implement your components (they just need to follow the core interfaces)
+4. Add a few examples so people know how to use it
+5. Open a PR
+
+**That's it.** No permission needed. If your module is useful, it gets merged. If it's experimental, we can mark it as such. The goal is to let people share.
+
+---
+
+## Current Status (v0.3.0-alpha)
+
+**What works:**
+- ✅ Core five-element architecture
+- ✅ All built-in components
+- ✅ Chaos prediction module
+- ✅ Scientific discovery module
+
+**What's in progress:**
+- ⚠️ API might be tweaked based on feedback
+- ⚠️ User manual is being written (yes, I'm writing it)
+- ⚠️ Edge cases need more testing
+
+**Why not on PyPI yet?**  
+I want to get feedback first, make sure the API feels right, and finish the documentation. Once stable, it'll be there.
+
+---
+
+## Installation
+
+```bash
+# Core only
+pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git
+
+# With chaos module
+pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[chaos]
+
+# With scientific discovery
+pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[sci]
+
+# Everything
+pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[full]
+```
+
+Dependencies are grouped, so you only install what you need.
+
+---
+
+## How to Contribute (Even Without Code)
+
+- **Star the repo** – lets me know someone cares
+- **Open an issue** – found a bug? have an idea?
+- **Improve docs** – fix typos, add explanations
+- **Write examples** – show how you use it in your field
+- **Tell people** – share it with your lab, your students, your Twitter followers
+
+---
+
+## The Vision
+
+A growing collection of domain-specific modules, all built on the same core framework. A physicist's chaos tools, a chemist's reaction kinetics, an economist's market models—all accessible through the same clean API.
+
+**Is that ambitious?** Yes.  
+**Can we build it together?** Also yes.
+
+---
+
+## License
+
+MIT – do what you want, just don't blame me if it breaks.
+
+---
+
+## Acknowledgements
+
+Started from my own experimental data needs. If you find it useful, great. If you want to build it together, even better.
+
+---
+
+**If you like it, star it. If you want to help, PR it. If you have ideas, issue it. If you want to add your own module, just do it.**
+
+---
+
+*Questions? Suggestions? Find me at [1799824258@qq.com](mailto:1799824258@qq.com)*

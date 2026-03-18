@@ -1,0 +1,108 @@
+"""
+Metathin Dependency Management
+=============================
+
+Installation commands:
+    pip install metathin                    # Install core only
+    pip install metathin[chaos]             # Install with chaos module
+    pip install metathin[sci]                # Install with scientific discovery module
+    pip install metathin[deep]               # Install with deep learning support
+    pip install metathin[viz]                 # Install with visualization tools
+    pip install metathin[full]                # Install all modules
+    pip install metathin[dev]                 # Install development dependencies
+
+Author: Lydian-Zhu
+Contact: 1799824258@qq.com
+"""
+
+# ============================================================
+# Core Dependencies (Required for all installations)
+# ============================================================
+# These are the minimal dependencies needed to run Metathin core
+# ------------------------------------------------------------
+numpy>=1.19.0                # Fundamental package for numerical computing
+
+# ============================================================
+# Chaos Module Dependencies
+# ============================================================
+# Install with: pip install metathin[chaos]
+# Provides chaos theory tools and nonlinear time series forecasting
+# ------------------------------------------------------------
+scipy>=1.5.0                 # Scientific computing (signal processing, optimization)
+scikit-learn>=0.24.0         # Machine learning tools (preprocessing, metrics)
+
+# ============================================================
+# Scientific Discovery Module Dependencies
+# ============================================================
+# Install with: pip install metathin[sci]
+# Provides tools for discovering mathematical laws from data
+# ------------------------------------------------------------
+scipy>=1.5.0                 # Curve fitting, optimization algorithms
+scikit-learn>=0.24.0         # Feature extraction, preprocessing
+matplotlib>=3.3.0            # Visualization for discovery reports
+reportlab>=3.6.0             # PDF report generation (optional)
+
+# ============================================================
+# Deep Learning Dependencies
+# ============================================================
+# Install with: pip install metathin[deep]
+# Enables neural network-based components
+# ------------------------------------------------------------
+torch>=1.9.0                 # PyTorch deep learning framework
+
+# ============================================================
+# Visualization Dependencies
+# ============================================================
+# Install with: pip install metathin[viz]
+# Enhanced plotting and visualization capabilities
+# ------------------------------------------------------------
+matplotlib>=3.3.0            # Core plotting library
+seaborn>=0.11.0              # Statistical data visualization
+
+# ============================================================
+# Data Processing Dependencies
+# ============================================================
+# Install with: pip install metathin[data]
+# Tools for handling various data formats
+# ------------------------------------------------------------
+pandas>=1.0.0                # Data manipulation and analysis
+openpyxl>=3.0.0              # Excel file support
+
+# ============================================================
+# Development Dependencies
+# ============================================================
+# Install with: pip install metathin[dev]
+# For contributors who want to develop and test
+# ------------------------------------------------------------
+pytest>=6.0.0                # Testing framework
+pytest-cov>=2.0.0            # Test coverage reporting
+black>=21.0.0                # Code formatter
+flake8>=3.9.0                # Code linter
+mypy>=0.900                  # Static type checking
+isort>=5.0.0                 # Import sorter
+
+# ============================================================
+# Documentation Dependencies
+# ============================================================
+# Install with: pip install metathin[docs]
+# For building project documentation
+# ------------------------------------------------------------
+sphinx>=4.0.0                # Documentation generator
+sphinx-rtd-theme>=1.0.0      # ReadTheDocs theme
+
+# ============================================================
+# Full Installation
+# ============================================================
+# Install with: pip install metathin[full]
+# Includes: core + chaos + sci + viz + data
+# ------------------------------------------------------------
+# (No direct dependencies - this is a meta-package)
+
+# ============================================================
+# All-in-One Development Installation
+# ============================================================
+# Install with: pip install metathin[all]
+# Includes: full + dev + docs
+# Perfect for contributors
+# ------------------------------------------------------------
+# (No direct dependencies - this is a meta-package) 
