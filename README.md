@@ -62,6 +62,21 @@ The project structure is clean, the interfaces are well-documented, and the type
 
 ---
 
+## What Makes Metathin Different?
+
+### 🧠 Memory Built-in, Not Bolted-on
+Most frameworks treat memory as an afterthought. In Metathin, it's built into the core from day one.
+
+Every agent comes with a complete memory system:
+- **Two-tier architecture**: Fast in-memory cache + persistent backend
+- **Multiple backends**: JSON (human-readable), SQLite (production), in-memory (testing) – swap them anytime
+- **Smart management**: LRU eviction when cache fills up, TTL (time-to-live) for auto-expiring items
+- **Every component can use it**: Behaviors can remember outcomes, Selectors can recall past fitness, Learning mechanisms can store experiences
+
+*Chaos prediction needs to remember the past to forecast the future. Your agents already do, without you writing a single line of storage code.*
+
+---
+
 ## Quick Start
 
 ```python
@@ -122,6 +137,9 @@ For nonlinear time series and dynamical systems:
 - Correlation dimension
 - Multiple predictors (phase space, Volterra, neural, spectral)
 - Full vs simplified versions for comparison
+
+**Why it works for time series**  
+Chaos prediction isn't just about algorithms—it's about remembering the past. Metathin's built-in memory system gives predictors access to historical states automatically, so you focus on the math, not the storage.
 
 *Perfect if you're into physics, math, or any field with complex dynamics.*
 
@@ -214,6 +232,7 @@ Create `metathin_plus.climate`:
 **What works:**
 - ✅ Core five-element architecture
 - ✅ All built-in components
+- ✅ Memory system (JSON/SQLite/in-memory backends, TTL, LRU)
 - ✅ Chaos prediction module
 - ✅ Scientific discovery module
 
