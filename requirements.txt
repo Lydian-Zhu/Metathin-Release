@@ -1,108 +1,205 @@
 """
 Metathin Dependency Management
-=============================
+==============================
 
-Installation commands:
-    pip install metathin                    # Install core only
-    pip install metathin[chaos]             # Install with chaos module
-    pip install metathin[sci]                # Install with scientific discovery module
-    pip install metathin[deep]               # Install with deep learning support
-    pip install metathin[viz]                 # Install with visualization tools
-    pip install metathin[full]                # Install all modules
-    pip install metathin[dev]                 # Install development dependencies
+Metathin 依赖管理
 
-Author: Lydian-Zhu
-Contact: 1799824258@qq.com
+Installation commands | 安装命令:
+    pip install metathin                    # Install core only | 仅安装核心
+    pip install metathin[chaos]             # Install with chaos module | 带混沌模块安装
+    pip install metathin[sci]               # Install with scientific discovery | 带科学发现模块安装
+    pip install metathin[deep]              # Install with deep learning support | 带深度学习支持安装
+    pip install metathin[viz]               # Install with visualization tools | 带可视化工具安装
+    pip install metathin[yaml]              # Install with YAML config support | 带 YAML 配置支持安装
+    pip install metathin[test]              # Install with testing tools | 带测试工具安装
+    pip install metathin[full]              # Install all modules | 安装所有模块
+    pip install metathin[dev]               # Install development dependencies | 安装开发依赖
+
+Author | 作者: Lydian-Zhu
+Contact | 联系方式: 1799824258@qq.com
+Version | 版本: 0.4.0
 """
 
 # ============================================================
 # Core Dependencies (Required for all installations)
+# 核心依赖（所有安装都需要）
 # ============================================================
 # These are the minimal dependencies needed to run Metathin core
+# 运行 Metathin 核心所需的最小依赖
 # ------------------------------------------------------------
-numpy>=1.19.0                # Fundamental package for numerical computing
+numpy>=1.19.0                # Fundamental package for numerical computing | 数值计算基础包
+
 
 # ============================================================
 # Chaos Module Dependencies
+# 混沌模块依赖
 # ============================================================
 # Install with: pip install metathin[chaos]
+# 安装命令：pip install metathin[chaos]
 # Provides chaos theory tools and nonlinear time series forecasting
+# 提供混沌理论工具和非线性时间序列预测
 # ------------------------------------------------------------
-scipy>=1.5.0                 # Scientific computing (signal processing, optimization)
-scikit-learn>=0.24.0         # Machine learning tools (preprocessing, metrics)
+scipy>=1.5.0                 # Scientific computing (signal processing, optimization) | 科学计算（信号处理、优化）
+scikit-learn>=0.24.0         # Machine learning tools (preprocessing, metrics) | 机器学习工具（预处理、指标）
+
 
 # ============================================================
 # Scientific Discovery Module Dependencies
+# 科学发现模块依赖
 # ============================================================
 # Install with: pip install metathin[sci]
+# 安装命令：pip install metathin[sci]
 # Provides tools for discovering mathematical laws from data
+# 提供从数据中发现数学规律的工具
 # ------------------------------------------------------------
-scipy>=1.5.0                 # Curve fitting, optimization algorithms
-scikit-learn>=0.24.0         # Feature extraction, preprocessing
-matplotlib>=3.3.0            # Visualization for discovery reports
-reportlab>=3.6.0             # PDF report generation (optional)
+scipy>=1.5.0                 # Curve fitting, optimization algorithms | 曲线拟合、优化算法
+scikit-learn>=0.24.0         # Feature extraction, preprocessing | 特征提取、预处理
+matplotlib>=3.3.0            # Visualization for discovery reports | 发现报告可视化
+reportlab>=3.6.0             # PDF report generation (optional) | PDF 报告生成（可选）
+
 
 # ============================================================
 # Deep Learning Dependencies
+# 深度学习依赖
 # ============================================================
 # Install with: pip install metathin[deep]
+# 安装命令：pip install metathin[deep]
 # Enables neural network-based components
+# 启用基于神经网络的组件
 # ------------------------------------------------------------
-torch>=1.9.0                 # PyTorch deep learning framework
+torch>=1.9.0                 # PyTorch deep learning framework | PyTorch 深度学习框架
+
 
 # ============================================================
 # Visualization Dependencies
+# 可视化依赖
 # ============================================================
 # Install with: pip install metathin[viz]
+# 安装命令：pip install metathin[viz]
 # Enhanced plotting and visualization capabilities
+# 增强的绘图和可视化能力
 # ------------------------------------------------------------
-matplotlib>=3.3.0            # Core plotting library
-seaborn>=0.11.0              # Statistical data visualization
+matplotlib>=3.3.0            # Core plotting library | 核心绘图库
+seaborn>=0.11.0              # Statistical data visualization | 统计数据可视化
+
 
 # ============================================================
 # Data Processing Dependencies
+# 数据处理依赖
 # ============================================================
 # Install with: pip install metathin[data]
+# 安装命令：pip install metathin[data]
 # Tools for handling various data formats
+# 处理各种数据格式的工具
 # ------------------------------------------------------------
-pandas>=1.0.0                # Data manipulation and analysis
-openpyxl>=3.0.0              # Excel file support
+pandas>=1.0.0                # Data manipulation and analysis | 数据处理与分析
+openpyxl>=3.0.0              # Excel file support | Excel 文件支持
+
+
+# ============================================================
+# YAML Configuration Support
+# YAML 配置支持
+# ============================================================
+# Install with: pip install metathin[yaml]
+# 安装命令：pip install metathin[yaml]
+# Enables YAML format for configuration files
+# 启用 YAML 格式的配置文件
+# ------------------------------------------------------------
+pyyaml>=5.1                  # YAML parser for config files | 配置文件的 YAML 解析器
+
+
+# ============================================================
+# Testing Dependencies
+# 测试依赖
+# ============================================================
+# Install with: pip install metathin[test]
+# 安装命令：pip install metathin[test]
+# For running the test suite
+# 用于运行测试套件
+# ------------------------------------------------------------
+pytest>=6.0.0                # Testing framework | 测试框架
+pytest-cov>=2.0.0            # Test coverage reporting | 测试覆盖率报告
+pytest-xdist>=2.0.0          # Parallel test execution | 并行测试执行
+
 
 # ============================================================
 # Development Dependencies
+# 开发依赖
 # ============================================================
 # Install with: pip install metathin[dev]
+# 安装命令：pip install metathin[dev]
 # For contributors who want to develop and test
+# 为想要开发和测试的贡献者准备
 # ------------------------------------------------------------
-pytest>=6.0.0                # Testing framework
-pytest-cov>=2.0.0            # Test coverage reporting
-black>=21.0.0                # Code formatter
-flake8>=3.9.0                # Code linter
-mypy>=0.900                  # Static type checking
-isort>=5.0.0                 # Import sorter
+pytest>=6.0.0                # Testing framework | 测试框架
+pytest-cov>=2.0.0            # Test coverage reporting | 测试覆盖率报告
+pytest-xdist>=2.0.0          # Parallel test execution | 并行测试执行
+black>=21.0.0                # Code formatter | 代码格式化工具
+flake8>=3.9.0                # Code linter | 代码检查工具
+mypy>=0.900                  # Static type checking | 静态类型检查
+isort>=5.0.0                 # Import sorter | 导入排序工具
+
 
 # ============================================================
 # Documentation Dependencies
+# 文档依赖
 # ============================================================
 # Install with: pip install metathin[docs]
+# 安装命令：pip install metathin[docs]
 # For building project documentation
+# 用于构建项目文档
 # ------------------------------------------------------------
-sphinx>=4.0.0                # Documentation generator
-sphinx-rtd-theme>=1.0.0      # ReadTheDocs theme
+sphinx>=4.0.0                # Documentation generator | 文档生成器
+sphinx-rtd-theme>=1.0.0      # ReadTheDocs theme | ReadTheDocs 主题
+
 
 # ============================================================
 # Full Installation
+# 完整安装
 # ============================================================
 # Install with: pip install metathin[full]
-# Includes: core + chaos + sci + viz + data
+# 安装命令：pip install metathin[full]
+# Includes: core + chaos + sci + viz + data + yaml
+# 包含：核心 + 混沌 + 科学发现 + 可视化 + 数据处理 + YAML 支持
 # ------------------------------------------------------------
 # (No direct dependencies - this is a meta-package)
+# （无直接依赖 - 这是一个元包）
+
 
 # ============================================================
 # All-in-One Development Installation
+# 全量开发安装
 # ============================================================
 # Install with: pip install metathin[all]
+# 安装命令：pip install metathin[all]
 # Includes: full + dev + docs
 # Perfect for contributors
+# 包含：完整 + 开发 + 文档
+# 非常适合贡献者
 # ------------------------------------------------------------
-# (No direct dependencies - this is a meta-package) 
+# (No direct dependencies - this is a meta-package)
+# （无直接依赖 - 这是一个元包）
+
+
+# ============================================================
+# Quick Installation Examples | 快速安装示例
+# ============================================================
+
+"""
+Quick Start | 快速开始:
+
+    # 1. Create virtual environment | 创建虚拟环境
+    python -m venv metathin_env
+    source metathin_env/bin/activate  # On Windows: metathin_env\\Scripts\\activate
+
+    # 2. Install Metathin | 安装 Metathin
+    pip install -e .                    # Development mode | 开发模式
+    # or | 或者
+    pip install metathin[full]          # Production with all features | 生产环境全功能
+
+    # 3. Verify installation | 验证安装
+    python -c "import metathin; print(metathin.__version__)"
+
+    # 4. Run tests (if installed with [test]) | 运行测试（如果安装了 [test]）
+    pytest tests/ -v
+"""

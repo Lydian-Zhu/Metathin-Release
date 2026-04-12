@@ -2,319 +2,302 @@
 Metathin - Meta-Cognitive Agent System Construction Framework
 ===============================================================
 
-Metathin derives from Meta+Thinking, a thinking-oriented agent framework built from the 
-ground up based on cognitive principles. The framework is designed around the quintuple
-structure (P, B, S, D, Ψ), with all components interface-driven and supporting custom
-implementations.
+Metathin 是一个基于五元组结构 (P, B, S, D, Ψ) 构建认知代理的框架。
 
-Core Components:
-    - PatternSpace: Pattern space, converts input to feature vectors (perception layer)
-    - MetaBehavior: Meta-behavior, executable skill units (action layer)
-    - Selector: Selector, evaluates behavior suitability (evaluation layer)
-    - DecisionStrategy: Decision strategy, selects optimal behavior (decision layer)
-    - LearningMechanism: Learning mechanism, adjusts based on feedback (learning layer)
+Metathin is a framework for building cognitive agents based on the quintuple
+structure (P, B, S, D, Ψ).
 
-Design Philosophy:
-    - Fixed interfaces, free implementation: Framework defines clear interfaces, users can implement their own algorithms arbitrarily
-    - Modular: Components can be independently replaced and combined
-    - Extensible: Supports custom components and third-party integration
-    - Type-safe: Type annotations improve code reliability
+Core Components | 核心组件:
+    - PatternSpace (P): 模式空间，将输入转换为特征向量 (感知层)
+      Pattern space, converts input to feature vectors (perception layer)
+    - MetaBehavior (B): 元行为，可执行的技能单元 (行动层)
+      Meta-behavior, executable skill units (action layer)
+    - Selector (S): 选择器，评估行为适用性 (评估层)
+      Selector, evaluates behavior suitability (evaluation layer)
+    - DecisionStrategy (D): 决策策略，选择最优行为 (决策层)
+      Decision strategy, selects optimal behavior (decision layer)
+    - LearningMechanism (Ψ): 学习机制，根据反馈调整参数 (学习层)
+      Learning mechanism, adjusts based on feedback (learning layer)
 
-Version: 0.1.0
-Author: Lydian-Zhu
-License: MIT
+Design Philosophy | 设计理念:
+    - Fixed interfaces, free implementation | 固定接口，自由实现
+    - Modular and composable | 模块化与可组合
+    - Type safe and observable | 类型安全与可观测
+
+Version | 版本: 0.4.0 (重构版 | Refactored)
+Author | 作者: Lydian-Zhu
+License | 许可证: MIT
 """
 
 # ============================================================
-# Preprocessing Area: Version and Author Information
+# Version Information | 版本信息
 # ============================================================
 
-__version__ = '0.1.0'           # Framework version, follows semantic versioning
-__author__ = 'Lydian-Zhu'       # Author information
-__license__ = 'MIT'              # Open source license
+__version__ = '0.4.0'
+__author__ = 'Lydian-Zhu'
+__license__ = 'MIT'
 
 # ============================================================
-# Function Area: Core Module Imports
+# Core Exports (Backward Compatible) | 核心导出（向后兼容）
 # ============================================================
 
-# -------------------------------------------------------------------
-# 1. Core Framework Imports
-#    Metathin main class and configuration, foundation for all agents
-# -------------------------------------------------------------------
-from metathin.core import Metathin           # Main class: Core agent integrating the quintuple
-from metathin.core import MetathinConfig    # Configuration class: Controls agent behavior parameters
+# Agent classes | 代理类
+from metathin.agent import Metathin, MetathinBuilder
 
-# -------------------------------------------------------------------
-# 2. Core Interface Imports
-#    Abstract base classes for the quintuple, all custom components must inherit from these interfaces
-# -------------------------------------------------------------------
+# Core interfaces (P, B, S, D, Ψ) | 核心接口
 from metathin.core import (
-    PatternSpace,          # Pattern space interface P: Window to perceive the environment
-    MetaBehavior,          # Meta-behavior interface B: System's skill collection
-    Selector,              # Selector interface S: Evaluates behavior suitability
-    DecisionStrategy,      # Decision strategy interface D: Selects optimal behavior based on fitness
-    LearningMechanism,     # Learning mechanism interface Ψ: Adjusts parameters based on feedback
+    # Types | 类型
+    T, R,
+    FeatureVector,
+    FitnessScore,
+    ParameterDict,
+    
+    # Exceptions | 异常
+    MetathinError,
+    PatternExtractionError,
+    BehaviorExecutionError,
+    FitnessComputationError,
+    DecisionError,
+    NoBehaviorError,
+    LearningError,
+    ParameterUpdateError,
+    
+    # Quintuple Interfaces | 五元组接口
+    PatternSpace,
+    MetaBehavior,
+    Selector,
+    DecisionStrategy,
+    LearningMechanism,
+    
+    # Memory Backend | 记忆后端
+    MemoryBackend,
 )
 
-# -------------------------------------------------------------------
-# 3. Exception Class Imports
-#    Various exceptions defined by the framework for error handling and debugging
-# -------------------------------------------------------------------
-from metathin.core import (
-    MetathinError,                 # Base exception class, parent of all custom exceptions
-    PatternExtractionError,        # Pattern extraction error: Raised when pattern space cannot extract features
-    BehaviorExecutionError,        # Behavior execution error: Exception during behavior execution
-    FitnessComputationError,       # Fitness computation error: Selector cannot compute fitness
-    DecisionError,                  # Decision error: Decision strategy cannot make a choice
-    NoBehaviorError,                # No available behavior: All behaviors unsuitable for current state
-    LearningError,                  # Learning error: Learning mechanism fails to update parameters
-    ParameterUpdateError,           # Parameter update error: Failed to update selector parameters
+# Configuration | 配置
+from metathin.config import (
+    MetathinConfig,
+    PipelineConfig,
+    MemoryConfig,
+    ObservabilityConfig,
+    load_config,
+    save_config,
 )
 
-# -------------------------------------------------------------------
-# 4. State and Record Class Imports
-#    Used for tracking the agent's thinking process and internal state
-# -------------------------------------------------------------------
-from metathin.core import (
-    Thought,                # Thought record: Records a complete thinking process
-    ThinkingStage,          # Thinking stage: Enumerates different stages of thinking (perceive, hypothesize, decide, etc.)
-    LearningStatus,         # Learning status: Enumerates learning outcomes (success, failed, skipped)
+# Services | 服务
+from metathin.services import (
+    MemoryManager,
+    HistoryTracker,
+    ThoughtRecord,
+    MetricsCollector,
+    ThoughtMetrics,
+    AggregatedMetrics,
 )
 
-# -------------------------------------------------------------------
-# 5. Memory System Imports
-#    Provides persistent memory capabilities, supports multiple storage backends
-# -------------------------------------------------------------------
-from metathin.core import MemoryManager      # Memory manager: Cache + persistence
-from metathin.core.memory import (
-    MemoryBackend,          # Memory backend interface: Abstract base for all storage backends
-    InMemoryBackend,        # In-memory backend: Fastest but non-persistent
-    JSONMemoryBackend,      # JSON file backend: Human-readable persistence based on JSON files
-    SQLiteMemoryBackend,    # SQLite backend: Production-ready persistence based on SQLite database
-    TTLMemoryManager,       # TTL memory manager: Memory management with time-to-live
-)
 
 # ============================================================
-# Function Area: Built-in Component Imports
+# Lazy Imports for Components (Performance) | 组件延迟导入（性能优化）
 # ============================================================
 
-# -------------------------------------------------------------------
-# 6. Pattern Space Components
-#    Various pre-built feature extractors that convert raw input to feature vectors
-# -------------------------------------------------------------------
-try:
-    from metathin.components.pattern_space import (
-        SimplePatternSpace,         # Simple pattern space: Function-based feature extraction
-        StatisticalPatternSpace,    # Statistical pattern space: Extracts statistical features (mean, variance, etc.)
-        NormalizedPatternSpace,     # Normalized pattern space: Normalizes features to a consistent range
-        CompositePatternSpace,      # Composite pattern space: Concatenates features from multiple pattern spaces
-        CachedPatternSpace,         # Cached pattern space: Caches extraction results for efficiency
-    )
-except ImportError:
-    # If component module doesn't exist, define placeholders
-    SimplePatternSpace = None
-    StatisticalPatternSpace = None
-    NormalizedPatternSpace = None
-    CompositePatternSpace = None
-    CachedPatternSpace = None
+# These are imported lazily to avoid circular imports and improve startup time
+# 延迟导入以避免循环依赖并提高启动时间
 
-# -------------------------------------------------------------------
-# 7. Meta-Behavior Components
-#    Various pre-built executable skill units
-# -------------------------------------------------------------------
-try:
-    from metathin.components.behavior_library import (
-        FunctionBehavior,       # Function-based behavior: Implements behavior using regular Python functions
-        LambdaBehavior,         # Lambda behavior: Simple behaviors created with lambda expressions
-        CompositeBehavior,      # Composite behavior: Executes multiple sub-behaviors in sequence
-        RetryBehavior,          # Retry behavior: Adds retry mechanism to another behavior
-        TimeoutBehavior,        # Timeout behavior: Adds timeout control to another behavior
-        ConditionalBehavior,    # Conditional behavior: Selects different sub-behaviors based on conditions
-        CachedBehavior,         # Cached behavior: Adds result caching to another behavior
-    )
-except ImportError:
-    FunctionBehavior = None
-    LambdaBehavior = None
-    CompositeBehavior = None
-    RetryBehavior = None
-    TimeoutBehavior = None
-    ConditionalBehavior = None
-    CachedBehavior = None
+_COMPONENTS_MODULES = {
+    # Pattern Space Components | 模式空间组件
+    'SimplePatternSpace': 'metathin.components.pattern_space',
+    'StatisticalPatternSpace': 'metathin.components.pattern_space',
+    'NormalizedPatternSpace': 'metathin.components.pattern_space',
+    'CompositePatternSpace': 'metathin.components.pattern_space',
+    'CachedPatternSpace': 'metathin.components.pattern_space',
+    
+    # Behavior Components | 行为组件
+    'FunctionBehavior': 'metathin.components.behavior_library',
+    'LambdaBehavior': 'metathin.components.behavior_library',
+    'CompositeBehavior': 'metathin.components.behavior_library',
+    'RetryBehavior': 'metathin.components.behavior_library',
+    'TimeoutBehavior': 'metathin.components.behavior_library',
+    'ConditionalBehavior': 'metathin.components.behavior_library',
+    'CachedBehavior': 'metathin.components.behavior_library',
+    
+    # Selector Components | 选择器组件
+    'SimpleSelector': 'metathin.components.selector',
+    'PolynomialSelector': 'metathin.components.selector',
+    'RuleBasedSelector': 'metathin.components.selector',
+    'EnsembleSelector': 'metathin.components.selector',
+    'AdaptiveSelector': 'metathin.components.selector',
+    
+    # Decision Strategy Components | 决策策略组件
+    'MaxFitnessStrategy': 'metathin.components.decision',
+    'ProbabilisticStrategy': 'metathin.components.decision',
+    'EpsilonGreedyStrategy': 'metathin.components.decision',
+    'RoundRobinStrategy': 'metathin.components.decision',
+    'RandomStrategy': 'metathin.components.decision',
+    'BoltzmannStrategy': 'metathin.components.decision',
+    'HybridStrategy': 'metathin.components.decision',
+    
+    # Learning Mechanism Components | 学习机制组件
+    'GradientLearning': 'metathin.components.learning',
+    'RewardLearning': 'metathin.components.learning',
+    'MemoryLearning': 'metathin.components.learning',
+    'HebbianLearning': 'metathin.components.learning',
+    'EnsembleLearning': 'metathin.components.learning',
+    'Experience': 'metathin.components.learning',
+}
 
-# -------------------------------------------------------------------
-# 8. Selector Components
-#    Various fitness calculators that evaluate behavior suitability in the current state
-# -------------------------------------------------------------------
-try:
-    from metathin.components.selector import (
-        SimpleSelector,         # Simple selector: Computes fitness based on weighted sum
-        PolynomialSelector,     # Polynomial selector: Uses polynomial regression for fitness computation
-        RuleBasedSelector,      # Rule-based selector: Uses predefined rules to compute fitness
-        EnsembleSelector,       # Ensemble selector: Combines results from multiple selectors
-        AdaptiveSelector,       # Adaptive selector: Dynamically adjusts strategy based on performance
-    )
-except ImportError:
-    SimpleSelector = None
-    PolynomialSelector = None
-    RuleBasedSelector = None
-    EnsembleSelector = None
-    AdaptiveSelector = None
 
-# -------------------------------------------------------------------
-# 9. Decision Strategy Components
-#    Various behavior selection strategies that make decisions based on fitness scores
-# -------------------------------------------------------------------
-try:
-    from metathin.components.decision import (
-        MaxFitnessStrategy,     # Maximum fitness strategy: Always selects the behavior with highest fitness
-        ProbabilisticStrategy,  # Probabilistic strategy: Selects proportionally to fitness scores
-        EpsilonGreedyStrategy,  # ε-greedy strategy: Explores randomly with probability ε, exploits with probability 1-ε
-        RoundRobinStrategy,     # Round-robin strategy: Cycles through behaviors in order
-        RandomStrategy,         # Random strategy: Completely random behavior selection
-        BoltzmannStrategy,      # Boltzmann strategy: Probabilistic selection based on exponential weighting
-        HybridStrategy,         # Hybrid strategy: Combines multiple strategies, switches based on conditions
-    )
-except ImportError:
-    MaxFitnessStrategy = None
-    ProbabilisticStrategy = None
-    EpsilonGreedyStrategy = None
-    RoundRobinStrategy = None
-    RandomStrategy = None
-    BoltzmannStrategy = None
-    HybridStrategy = None
+def __getattr__(name):
+    """
+    Lazy import for components.
+    
+    组件的延迟导入。
+    
+    This allows importing components without loading all of them at once,
+    improving startup time and reducing memory usage.
+    
+    这允许在不一次性加载所有组件的情况下导入组件，
+    提高启动时间并减少内存使用。
+    """
+    if name in _COMPONENTS_MODULES:
+        import importlib
+        module = importlib.import_module(_COMPONENTS_MODULES[name])
+        return getattr(module, name)
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
-# -------------------------------------------------------------------
-# 10. Learning Mechanism Components
-#     Various parameter update algorithms that enable the agent to learn from experience
-# -------------------------------------------------------------------
-try:
-    from metathin.components.learning import (
-        GradientLearning,       # Gradient learning: Error-based gradient descent
-        RewardLearning,         # Reward learning: Adjusts parameters based on reward signals
-        MemoryLearning,         # Memory learning: Learns from historical experiences
-        HebbianLearning,        # Hebbian learning: "Cells that fire together, wire together"
-        EnsembleLearning,       # Ensemble learning: Combines results from multiple learners
-        Experience,             # Experience sample: Records a complete execution experience
-    )
-except ImportError:
-    GradientLearning = None
-    RewardLearning = None
-    MemoryLearning = None
-    HebbianLearning = None
-    EnsembleLearning = None
-    Experience = None
+
+def __dir__():
+    """
+    Custom dir() for better IDE support.
+    
+    自定义 dir() 以获得更好的 IDE 支持。
+    """
+    return sorted(list(__all__) + list(_COMPONENTS_MODULES.keys()))
+
 
 # ============================================================
-# Export Interface Definition
+# Module Docstring | 模块文档字符串
 # ============================================================
-# __all__ controls what gets imported with 'from metathin import *'
-# Grouped by functionality for easier user reference
+
+__doc__ = """
+Metathin - Meta-Cognitive Agent System Construction Framework
+==============================================================
+
+Metathin is a framework for building cognitive agents based on the quintuple
+structure (P, B, S, D, Ψ).
+
+Quick Start | 快速开始:
+    >>> from metathin import Metathin, MetathinBuilder
+    >>> from metathin import SimplePatternSpace, FunctionBehavior
+    >>> 
+    >>> # Create agent using builder | 使用构建器创建代理
+    >>> agent = (MetathinBuilder()
+    ...     .with_pattern_space(SimplePatternSpace(lambda x: [len(x)]))
+    ...     .with_behavior(FunctionBehavior("greet", lambda f,**k: "Hello!"))
+    ...     .build())
+    >>> 
+    >>> # Use agent | 使用代理
+    >>> result = agent.think("world")
+    >>> print(result)  # "Hello!"
+
+For more examples, see the documentation | 更多示例请查看文档:
+    https://github.com/Lydian-Zhu/Metathin-Release
+
+Architecture | 架构:
+    metathin/
+    ├── core/          # Core interfaces (P, B, S, D, Ψ) | 核心接口
+    ├── engine/        # Thinking pipeline | 思考流水线
+    ├── services/      # Optional services (memory, history, metrics) | 可选服务
+    ├── config/        # Configuration system | 配置系统
+    ├── agent/         # Agent facade and builder | 代理门面和构建器
+    └── components/    # Built-in implementations | 内置实现
+"""
+
+
+# ============================================================
+# Export Interface | 导出接口
 # ============================================================
 
 __all__ = [
-    # -------------------------------------------------------------------
-    # 1. Version Information
-    # -------------------------------------------------------------------
-    '__version__',           # Framework version number
-    '__author__',            # Author information
-    '__license__',           # License information
+    # Version | 版本
+    '__version__',
+    '__author__',
+    '__license__',
     
-    # -------------------------------------------------------------------
-    # 2. Core Classes
-    #    Fundamental classes required when using the framework
-    # -------------------------------------------------------------------
-    'Metathin',              # Main class: Entry point for creating agents
-    'MetathinConfig',        # Configuration class: Sets agent behavior parameters
-    'Thought',               # Thought record: Debugging and analysis tool
-    'ThinkingStage',         # Thinking stage enumeration
-    'LearningStatus',        # Learning status enumeration
+    # Agent | 代理
+    'Metathin',
+    'MetathinBuilder',
     
-    # -------------------------------------------------------------------
-    # 3. Core Interfaces
-    #    Abstract base classes to inherit when creating custom components
-    # -------------------------------------------------------------------
-    'PatternSpace',          # Pattern space interface
-    'MetaBehavior',          # Meta-behavior interface
-    'Selector',              # Selector interface
-    'DecisionStrategy',      # Decision strategy interface
-    'LearningMechanism',     # Learning mechanism interface
+    # Types | 类型
+    'T', 'R',
+    'FeatureVector',
+    'FitnessScore',
+    'ParameterDict',
     
-    # -------------------------------------------------------------------
-    # 4. Core Exceptions
-    #    Exception types that may be raised by the framework
-    # -------------------------------------------------------------------
-    'MetathinError',                 # Base exception
-    'PatternExtractionError',        # Feature extraction error
-    'BehaviorExecutionError',        # Behavior execution error
-    'FitnessComputationError',       # Fitness computation error
-    'DecisionError',                  # Decision error
-    'NoBehaviorError',                # No available behavior
-    'LearningError',                  # Learning error
-    'ParameterUpdateError',           # Parameter update error
+    # Exceptions | 异常
+    'MetathinError',
+    'PatternExtractionError',
+    'BehaviorExecutionError',
+    'FitnessComputationError',
+    'DecisionError',
+    'NoBehaviorError',
+    'LearningError',
+    'ParameterUpdateError',
     
-    # -------------------------------------------------------------------
-    # 5. Memory Management
-    #    Persistent memory related classes
-    # -------------------------------------------------------------------
-    'MemoryManager',         # Memory manager
-    'InMemoryBackend',       # In-memory backend
-    'MemoryBackend',         # Memory backend interface
-    'JSONMemoryBackend',     # JSON file backend
-    'SQLiteMemoryBackend',   # SQLite database backend
-    'TTLMemoryManager',      # TTL memory manager
+    # Core Interfaces | 核心接口
+    'PatternSpace',
+    'MetaBehavior',
+    'Selector',
+    'DecisionStrategy',
+    'LearningMechanism',
     
-    # -------------------------------------------------------------------
-    # 6. Pattern Space Components
-    #    Pre-built feature extractors
-    # -------------------------------------------------------------------
-    'SimplePatternSpace',        # Function-based feature extraction
-    'StatisticalPatternSpace',   # Statistical feature extraction
-    'NormalizedPatternSpace',    # Normalized feature extraction
-    'CompositePatternSpace',     # Composite feature extraction
-    'CachedPatternSpace',        # Cached feature extraction
+    # Memory | 记忆
+    'MemoryBackend',
+    'MemoryManager',
     
-    # -------------------------------------------------------------------
-    # 7. Meta-Behavior Components
-    #    Pre-built skill units
-    # -------------------------------------------------------------------
-    'FunctionBehavior',      # Function-based behavior
-    'LambdaBehavior',        # Lambda behavior
-    'CompositeBehavior',     # Composite behavior
-    'RetryBehavior',         # Retry behavior
-    'TimeoutBehavior',       # Timeout behavior
-    'ConditionalBehavior',   # Conditional behavior
-    'CachedBehavior',        # Cached behavior
+    # History | 历史
+    'HistoryTracker',
+    'ThoughtRecord',
     
-    # -------------------------------------------------------------------
-    # 8. Selector Components
-    #    Pre-built fitness calculators
-    # -------------------------------------------------------------------
-    'SimpleSelector',        # Simple linear selector
-    'PolynomialSelector',    # Polynomial selector
-    'RuleBasedSelector',     # Rule-based selector
-    'EnsembleSelector',      # Ensemble selector
-    'AdaptiveSelector',      # Adaptive selector
+    # Metrics | 指标
+    'MetricsCollector',
+    'ThoughtMetrics',
+    'AggregatedMetrics',
     
-    # -------------------------------------------------------------------
-    # 9. Decision Strategy Components
-    #    Pre-built behavior selection strategies
-    # -------------------------------------------------------------------
-    'MaxFitnessStrategy',    # Maximum fitness strategy
-    'ProbabilisticStrategy', # Probabilistic strategy
-    'EpsilonGreedyStrategy', # ε-greedy strategy
-    'RoundRobinStrategy',    # Round-robin strategy
-    'RandomStrategy',        # Random strategy
-    'BoltzmannStrategy',     # Boltzmann strategy
-    'HybridStrategy',        # Hybrid strategy
+    # Configuration | 配置
+    'MetathinConfig',
+    'PipelineConfig',
+    'MemoryConfig',
+    'ObservabilityConfig',
+    'load_config',
+    'save_config',
     
-    # -------------------------------------------------------------------
-    # 10. Learning Mechanism Components
-    #     Pre-built parameter update algorithms
-    # -------------------------------------------------------------------
-    'GradientLearning',      # Gradient learning
-    'RewardLearning',        # Reward learning
-    'MemoryLearning',        # Memory learning
-    'HebbianLearning',       # Hebbian learning
-    'EnsembleLearning',      # Ensemble learning
-    'Experience',            # Experience sample
+    # Components (lazy) | 组件（延迟）
+    'SimplePatternSpace',
+    'StatisticalPatternSpace',
+    'NormalizedPatternSpace',
+    'CompositePatternSpace',
+    'CachedPatternSpace',
+    'FunctionBehavior',
+    'LambdaBehavior',
+    'CompositeBehavior',
+    'RetryBehavior',
+    'TimeoutBehavior',
+    'ConditionalBehavior',
+    'CachedBehavior',
+    'SimpleSelector',
+    'PolynomialSelector',
+    'RuleBasedSelector',
+    'EnsembleSelector',
+    'AdaptiveSelector',
+    'MaxFitnessStrategy',
+    'ProbabilisticStrategy',
+    'EpsilonGreedyStrategy',
+    'RoundRobinStrategy',
+    'RandomStrategy',
+    'BoltzmannStrategy',
+    'HybridStrategy',
+    'GradientLearning',
+    'RewardLearning',
+    'MemoryLearning',
+    'HebbianLearning',
+    'EnsembleLearning',
+    'Experience',
 ]

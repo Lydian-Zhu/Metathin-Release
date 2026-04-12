@@ -1,258 +1,163 @@
 """
-Metathin Core Package
-=====================
+Metathin Core Package - Quintuple Interface Definitions
+=========================================================
 
-The core layer contains the fundamental interfaces for the quintuple (P, B, S, D, Ψ) 
-and the main class implementation. This serves as the foundation of the entire 
-framework, defining the behavioral specifications for all core components.
+Metathin 核心包 - 五元组接口定义
 
-Core Components:
-    - Quintuple Interfaces: PatternSpace, MetaBehavior, Selector, DecisionStrategy, LearningMechanism
-    - Main Class: Metathin - Agent implementation integrating the quintuple
-    - Memory System: Provides persistent memory capabilities
-    - Exception Hierarchy: Unified error handling mechanism
+This package contains the fundamental interfaces for the quintuple (P, B, S, D, Ψ)
+and supporting type definitions. These interfaces are the foundation of the entire
+framework - all custom components must inherit from these interfaces.
 
-Design Principles:
-    - Fixed interfaces, free implementation: All core components are abstract base classes
-    - Type safety: Uses type aliases and annotations throughout
-    - Modularity: Each functionality is independent and replaceable
-    - Extensibility: Users can implement custom components by inheriting from interfaces
+本包包含五元组 (P, B, S, D, Ψ) 的基础接口和支持类型定义。
+这些接口是整个框架的基础——所有自定义组件都必须继承这些接口。
+
+Module Structure | 模块结构:
+    - types.py: Type aliases (FeatureVector, FitnessScore, ParameterDict)
+               类型别名（特征向量、适应度分数、参数字典）
+    - exceptions.py: Unified exception hierarchy
+                     统一异常体系
+    - p_pattern.py: PatternSpace interface (Perception layer | 感知层)
+    - b_behavior.py: MetaBehavior interface (Action layer | 行动层)
+    - s_selector.py: Selector interface (Evaluation layer | 评估层)
+    - d_decision.py: DecisionStrategy interface (Decision layer | 决策层)
+    - psi_learning.py: LearningMechanism interface (Learning layer | 学习层)
+    - memory_backend.py: MemoryBackend interface (Storage backend | 存储后端)
+
+Design Philosophy | 设计理念:
+    - Fixed interfaces, free implementation | 固定接口，自由实现
+    - Type safety throughout | 全程类型安全
+    - Clear separation of concerns | 清晰的关注点分离
 """
 
 # ============================================================
-# Function Area: Core Interface and Exception Imports
+# Type Definitions | 类型定义
 # ============================================================
 
-# -------------------------------------------------------------------
-# 1. Type Aliases and Exception Classes
-#    These form the foundational type definitions and error handling 
-#    mechanisms of the framework
-# -------------------------------------------------------------------
-from metathin.core.interfaces import (
-    # ===== Type Aliases =====
-    # These type aliases provide clear semantics and enhance code readability.
-    # They serve as documentation for what types are expected in different contexts.
-    FeatureVector,      # Type alias for feature vectors: numpy.ndarray
-                        # Represents features extracted by PatternSpace from raw input
-    
-    FitnessScore,       # Type alias for fitness scores: float, range [0,1]
-                        # Indicates how suitable a behavior is for current context
-    
-    ParameterDict,      # Type alias for parameter dictionaries: Dict[str, float]
-                        # Used for selector parameter adjustments and learning
-    
-    # ===== Exception Classes =====
-    # Unified exception hierarchy for consistent error handling throughout the framework.
-    # All custom exceptions inherit from MetathinError, allowing users to catch
-    # all framework-specific exceptions with a single except clause.
-    MetathinError,                  # Base exception class, parent of all custom exceptions
-    PatternExtractionError,         # Raised when feature extraction fails
-    BehaviorExecutionError,         # Raised when behavior execution encounters an exception
-    FitnessComputationError,        # Raised when fitness calculation fails
-    DecisionError,                  # Raised when decision process encounters an error
-    NoBehaviorError,                # Raised when no behaviors are available for selection
-    LearningError,                  # Raised when learning process encounters an error
-    ParameterUpdateError,           # Raised when parameter update fails
-    
-    # ===== Core Interfaces =====
-    # Abstract base classes for the quintuple. All custom components MUST inherit
-    # from these interfaces to ensure compatibility with the framework.
-    PatternSpace,       # Pattern Space Interface P: Converts raw input to feature vectors
-                        # Must implement extract() method
-    
-    MetaBehavior,       # Meta-Behavior Interface B: Executable skill units
-                        # Must implement execute() method, can optionally implement
-                        # before_execute(), after_execute(), and on_error() hooks
-    
-    Selector,           # Selector Interface S: Evaluates behavior suitability
-                        # Computes fitness scores for each behavior based on features
-                        # Must implement compute_fitness() method
-    
-    DecisionStrategy,   # Decision Strategy Interface D: Selects optimal behavior
-                        # Makes decisions based on fitness scores
-                        # Must implement select() method
-    
-    LearningMechanism,  # Learning Mechanism Interface Ψ: Adjusts parameters based on feedback
-                        # Updates selector parameters using expected vs actual results
-                        # Must implement compute_adjustment() method
+from .types import (
+    T,                  # Generic input type | 泛型输入类型
+    R,                  # Generic result type | 泛型结果类型
+    FeatureVector,      # Feature vector type | 特征向量类型
+    FitnessScore,       # Fitness score type | 适应度分数类型
+    ParameterDict,      # Parameter dictionary type | 参数字典类型
 )
 
 # ============================================================
-# Function Area: Main Class Implementation Imports
+# Exception Definitions | 异常定义
 # ============================================================
 
-# -------------------------------------------------------------------
-# 2. Metathin Main Class and Helper Classes
-#    These are the core implementations that integrate the quintuple
-#    to complete the agent's cognitive cycle
-# -------------------------------------------------------------------
-from metathin.core.metathin import (
-    Metathin,           # Main class: Agent implementation integrating the quintuple (P,B,S,D,Ψ)
-                        # Provides think() method to execute a complete cognitive cycle:
-                        # Perceive → Hypothesize → Decide → Execute → Learn
-                        # Also provides memory functions (remember/recall) and persistence (save/load)
+from .exceptions import (
+    # Base exception | 基础异常
+    MetathinError,
     
-    Thought,            # Thought record class: Records a complete thinking process
-                        # Contains input, output, decision information, timings, etc.
-                        # Used for debugging, analysis, and visualization
-                        # Attributes include: features, selected_behavior, fitness_scores,
-                        # decision_time, execution_time, success, error_message, etc.
+    # Perception layer (P) | 感知层
+    PatternExtractionError,
     
-    ThinkingStage,      # Thinking stage enumeration: PERCEIVE, HYPOTHESIS, DECIDE, EXECUTE, LEARN
-                        # Tracks the agent's current stage during thinking process
-                        # Useful for progress monitoring and error localization
+    # Action layer (B) | 行动层
+    BehaviorExecutionError,
     
-    LearningStatus,     # Learning status enumeration: SUCCESS, FAILED, SKIPPED
-                        # Indicates the outcome of learning operations
-                        # SUCCESS: parameters were updated, FAILED: exception occurred,
-                        # SKIPPED: learning conditions were not met
+    # Evaluation layer (S) | 评估层
+    FitnessComputationError,
     
-    MetathinConfig,     # Configuration class: Controls agent behavior parameters
-                        # Includes learning rate, fitness threshold, memory configuration,
-                        # logging settings, error handling behavior, etc.
-                        # All parameters have sensible defaults but can be overridden
+    # Decision layer (D) | 决策层
+    DecisionError,
+    NoBehaviorError,
+    
+    # Learning layer (Ψ) | 学习层
+    LearningError,
+    ParameterUpdateError,
 )
 
 # ============================================================
-# Function Area: Memory System Imports
+# Quintuple Interfaces | 五元组接口
 # ============================================================
 
-# -------------------------------------------------------------------
-# 3. Memory System Components
-#    Provides persistent memory capabilities for the agent,
-#    supporting multiple storage backends with different characteristics
-# -------------------------------------------------------------------
-from metathin.core.memory import (
-    # ===== Memory Backend Interface and Implementations =====
-    # Backends handle the actual storage of memory data
-    MemoryBackend,       # Memory backend abstract interface: Defines save, load, delete methods
-                         # All concrete backends must implement these methods
-    
-    InMemoryBackend,     # In-memory backend: Stores data only in RAM
-                         # Fastest but non-persistent, lost when program exits
-                         # Suitable for temporary caching and testing
-    
-    JSONMemoryBackend,   # JSON file backend: Saves memory as human-readable JSON format
-                         # Suitable for small amounts of data and debugging
-                         # Easy to inspect and modify manually
-    
-    SQLiteMemoryBackend, # SQLite database backend: Supports large amounts of data and transactions
-                         # Suitable for production environments requiring persistence
-                         # Provides ACID guarantees and concurrent access
-    
-    # ===== Memory Managers =====
-    # Managers provide higher-level memory functionality with caching
-    MemoryManager,       # Memory manager: Provides two-tier memory architecture
-                         # Combines fast in-memory cache with persistent backend storage
-                         # Automatically handles cache hits/misses and synchronization
-    
-    TTLMemoryManager,    # TTL (Time-To-Live) memory manager: Memory with expiration
-                         # Each memory item has a time-to-live value
-                         # Automatically cleans up expired items
-                         # Useful for temporary or time-sensitive information
-)
+# P - Perception | 感知
+from .p_pattern import PatternSpace
+
+# B - Action | 行动
+from .b_behavior import MetaBehavior
+
+# S - Evaluation | 评估
+from .s_selector import Selector
+
+# D - Decision | 决策
+from .d_decision import DecisionStrategy
+
+# Ψ - Learning | 学习
+from .psi_learning import LearningMechanism
 
 # ============================================================
-# Export Interface Definition
+# Auxiliary Interfaces | 辅助接口
 # ============================================================
-# __all__ controls what gets imported when using 'from metathin.core import *'
-# It's grouped by functionality for easier user reference
+
+# Memory storage backend | 记忆存储后端
+from .memory_backend import MemoryBackend
+
+
+# ============================================================
+# Export Interface | 导出接口
 # ============================================================
 
 __all__ = [
-    # -------------------------------------------------------------------
-    # 1. Type Aliases
-    #    Used for type hints, improving code readability and IDE support
-    # -------------------------------------------------------------------
-    'FeatureVector',        # Feature vector type (numpy.ndarray)
-    'FitnessScore',         # Fitness score type (float in [0,1])
-    'ParameterDict',        # Parameter dictionary type (Dict[str, float])
+    # Types | 类型
+    'T',
+    'R',
+    'FeatureVector',
+    'FitnessScore',
+    'ParameterDict',
     
-    # -------------------------------------------------------------------
-    # 2. Exception Classes
-    #    Unified error handling mechanism
-    # -------------------------------------------------------------------
-    'MetathinError',                 # Base exception for all framework errors
-    'PatternExtractionError',        # Error during feature extraction
-    'BehaviorExecutionError',        # Error during behavior execution
-    'FitnessComputationError',       # Error during fitness calculation
-    'DecisionError',                  # Error during decision making
-    'NoBehaviorError',                # No behaviors available for selection
-    'LearningError',                  # Error during learning process
-    'ParameterUpdateError',           # Error during parameter update
+    # Exceptions | 异常
+    'MetathinError',
+    'PatternExtractionError',
+    'BehaviorExecutionError',
+    'FitnessComputationError',
+    'DecisionError',
+    'NoBehaviorError',
+    'LearningError',
+    'ParameterUpdateError',
     
-    # -------------------------------------------------------------------
-    # 3. Core Interfaces
-    #    Abstract base classes for the quintuple. Custom components MUST
-    #    inherit from these interfaces.
-    # -------------------------------------------------------------------
-    'PatternSpace',         # Pattern Space Interface (P) - Feature extraction
-    'MetaBehavior',         # Meta-Behavior Interface (B) - Executable skills
-    'Selector',             # Selector Interface (S) - Fitness computation
-    'DecisionStrategy',     # Decision Strategy Interface (D) - Behavior selection
-    'LearningMechanism',    # Learning Mechanism Interface (Ψ) - Parameter adjustment
+    # Quintuple Interfaces (P, B, S, D, Ψ) | 五元组接口
+    'PatternSpace',      # P - Perception | 感知
+    'MetaBehavior',      # B - Action | 行动
+    'Selector',          # S - Evaluation | 评估
+    'DecisionStrategy',  # D - Decision | 决策
+    'LearningMechanism', # Ψ - Learning | 学习
     
-    # -------------------------------------------------------------------
-    # 4. Main Classes
-    #    Core implementations of the agent
-    # -------------------------------------------------------------------
-    'Metathin',             # Main agent class - integrates the quintuple
-    'Thought',              # Thought record - captures complete thinking process
-    'ThinkingStage',        # Thinking stage enumeration - tracks progress
-    'LearningStatus',       # Learning status enumeration - records learning outcome
-    'MetathinConfig',       # Configuration class - controls agent behavior
-    
-    # -------------------------------------------------------------------
-    # 5. Memory Components
-    #    Persistent memory related components
-    # -------------------------------------------------------------------
-    'MemoryBackend',        # Memory backend interface - defines storage contract
-    'InMemoryBackend',      # In-memory backend implementation (fast, non-persistent)
-    'JSONMemoryBackend',    # JSON file backend implementation (human-readable)
-    'SQLiteMemoryBackend',  # SQLite database backend (production-ready)
-    'MemoryManager',        # Memory manager - two-tier caching system
-    'TTLMemoryManager',     # TTL memory manager - auto-expiring memory items
+    # Auxiliary Interfaces | 辅助接口
+    'MemoryBackend',     # Storage backend | 存储后端
 ]
 
-# ============================================================
-# Usage Example
-# ============================================================
-"""
-Basic usage example demonstrating how to create a simple agent:
 
->>> import numpy as np
->>> from metathin.core import Metathin, PatternSpace, MetaBehavior
+# ============================================================
+# Package Documentation | 包文档
+# ============================================================
+
+"""
+Usage Example | 使用示例:
+
+>>> from metathin.core import (
+...     PatternSpace, MetaBehavior, Selector,
+...     DecisionStrategy, LearningMechanism,
+...     FeatureVector, FitnessScore
+... )
 >>> 
->>> # Custom PatternSpace implementation
->>> # Converts input string to its length as a feature vector
->>> class MyPattern(PatternSpace):
-...     def extract(self, raw_input):
-...         # Simple feature: length of input string
+>>> # Implement custom pattern space | 实现自定义模式空间
+>>> class MyPattern(PatternSpace[str]):
+...     def extract(self, raw_input: str) -> FeatureVector:
 ...         return np.array([len(raw_input)], dtype=np.float64)
 >>> 
->>> # Custom MetaBehavior implementation
->>> # A simple greeting behavior
->>> class GreetBehavior(MetaBehavior):
-...     def __init__(self):
-...         self.name = "greet"
+>>> # Implement custom behavior | 实现自定义行为
+>>> class MyBehavior(MetaBehavior[str]):
+...     @property
+...     def name(self) -> str:
+...         return "my_behavior"
 ...     
-...     def execute(self, features, **context):
-...         return f"Hello, input length = {features[0]}"
-...     
-...     def get_complexity(self):
-...         return 1.0
+...     def execute(self, features: FeatureVector, **kwargs) -> str:
+...         return f"Feature length: {features[0]}"
 >>> 
->>> # Create agent with custom pattern space
->>> agent = Metathin(pattern_space=MyPattern())
->>> 
->>> # Register behavior
->>> agent.register_behavior(GreetBehavior())
->>> 
->>> # Execute thinking cycle
->>> result = agent.think("hello world")
->>> print(result)  # Output: "Hello, input length = 11"
->>> 
->>> # Check agent status
->>> status = agent.get_status()
->>> print(f"Total thoughts: {status['stats']['total_thoughts']}")
+>>> # Implement custom selector | 实现自定义选择器
+>>> class MySelector(Selector):
+...     def compute_fitness(self, behavior: MetaBehavior, 
+...                        features: FeatureVector) -> FitnessScore:
+...         return 0.5  # Always 0.5 | 总是 0.5
 """
