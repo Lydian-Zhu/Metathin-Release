@@ -3,8 +3,9 @@
 **A Meta-cognitive Agent System Construction Framework**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Lydian-Zhu/Metathin-Release/pulls)
+[![Tests](https://img.shields.io/badge/tests-492%20passed-brightgreen.svg)](https://github.com/Lydian-Zhu/Metathin-Release/pulls)
 
 ---
 
@@ -41,7 +42,7 @@ This abstraction doesn't care about what AI technology you use underneath. It ju
 
 ## Built-in Components? Optional.
 
-Metathin comes with 20+ pre-built components (`SimplePatternSpace`, `MaxFitnessStrategy`, `GradientLearning`...). **But you don't have to use them.**
+Metathin comes with 30+ pre-built components (`SimplePatternSpace`, `MaxFitnessStrategy`, `GradientLearning`...). **But you don't have to use them.**
 
 The framework's real value is in the **interfaces**:
 
@@ -62,9 +63,50 @@ The project structure is clean, the interfaces are well-documented, and the type
 
 ---
 
+## Project Structure (Refactored)
+
+```
+metathin/                    # Core framework
+├── core/                   # Five-element interfaces (P, B, S, D, Ψ)
+│   ├── p_pattern.py       # PatternSpace interface
+│   ├── b_behavior.py      # MetaBehavior interface
+│   ├── s_selector.py      # Selector interface
+│   ├── d_decision.py      # DecisionStrategy interface
+│   ├── psi_learning.py    # LearningMechanism interface
+│   └── memory_backend.py  # Storage backend interface
+├── engine/                 # Thinking pipeline
+│   ├── pipeline.py        # Pure function cognitive cycle
+│   ├── context.py         # State container
+│   └── hooks.py           # Extension points
+├── services/               # Optional services
+│   ├── memory_manager.py  # Two-tier caching
+│   ├── history_tracker.py # Thought history
+│   └── metrics_collector.py # Performance metrics
+├── config/                 # Configuration system
+│   ├── schema.py          # Config data structures
+│   └── loader.py          # Load from file/env
+├── agent/                  # Facade & builder
+│   ├── metathin.py        # Main agent class
+│   └── builder.py         # Fluent builder
+└── components/             # Built-in implementations
+    ├── pattern_space.py   # 5+ feature extractors
+    ├── behavior_library.py # 7+ behavior wrappers
+    ├── selector.py        # 5+ fitness calculators
+    ├── decision.py        # 7+ decision strategies
+    └── learning.py        # 5+ learning mechanisms
+
+metathin_plus/              # Domain extensions
+├── chaos/                 # Chaos prediction
+└── sci/                   # Scientific discovery
+```
+
+**Each file name tells you what it does** – `p_pattern.py` = Pattern Space, `b_behavior.py` = Behavior, etc.
+
+---
+
 ## What Makes Metathin Different?
 
-###  Memory Built-in, Not Bolted-on
+### Memory Built-in, Not Bolted-on
 Most frameworks treat memory as an afterthought. In Metathin, it's built into the core from day one.
 
 Every agent comes with a complete memory system:
@@ -75,7 +117,7 @@ Every agent comes with a complete memory system:
 
 *Chaos prediction needs to remember the past to forecast the future. Your agents already do, without you writing a single line of storage code.*
 
-###  RL-ready, but not RL-only
+### RL-ready, but not RL-only
 The five-tuple structure maps naturally to reinforcement learning:
 - P = state representation
 - B = action space  
@@ -87,29 +129,46 @@ But swap in a supervised Selector and a gradient-based Learner, and you're doing
 
 **Same architecture. Different components. Three paradigms.**
 
+### Clean, Layered Architecture
+The refactored codebase is organized into clear layers:
+- **Core** – Pure interfaces, no dependencies
+- **Engine** – Pure function pipeline, stateless
+- **Services** – Optional, injectable
+- **Config** – Separate from logic
+- **Agent** – Facade that assembles everything
+- **Components** – Concrete implementations
+
+This makes the code easy to understand, test, and extend.
+
 ---
 
 ## Quick Start
 
 ```python
-from metathin import Metathin
-from metathin.components import SimplePatternSpace, FunctionBehavior
-from metathin.components import MaxFitnessStrategy
+from metathin import Metathin, MetathinBuilder
+from metathin.components import SimplePatternSpace, FunctionBehavior, MaxFitnessStrategy
 
-# Define behaviors (note: **kwargs captures all extra parameters)
+# Define behaviors
 greet = FunctionBehavior("greet", lambda f,**k: "Hello! I'm an agent, how can I help?")
 echo = FunctionBehavior("echo", lambda f,**k: f"You just said: {k.get('user_input', '')}")
 
-# Create agent
+# Build agent (builder pattern)
+agent = (MetathinBuilder()
+    .with_pattern_space(SimplePatternSpace(lambda x: [len(x)]))
+    .with_behaviors([greet, echo])
+    .with_decision_strategy(MaxFitnessStrategy())
+    .with_name("SimpleAgent")
+    .build())
+
+# Or use direct constructor
 agent = Metathin(
     pattern_space=SimplePatternSpace(lambda x: [len(x)]),
     decision_strategy=MaxFitnessStrategy(),
     name="SimpleAgent"
 )
-
 agent.register_behaviors([greet, echo])
 
-# Let's chat
+# Chat
 print("Agent started, type 'quit' to exit")
 while True:
     user_input = input("\nYou: ")
@@ -124,20 +183,23 @@ Run it. It works.
 
 ---
 
-## Project Structure
+## Configuration Examples
 
+```python
+from metathin.config import MetathinConfig, MemoryConfig, ObservabilityConfig
+
+# Minimal config (no memory, no history)
+config = MetathinConfig.create_minimal()
+
+# Production config (SQLite memory, full observability)
+config = MetathinConfig.create_production("MyAgent")
+
+# Custom config
+config = MetathinConfig(
+    memory=MemoryConfig(enabled=True, backend_type='sqlite'),
+    observability=ObservabilityConfig(keep_history=True, enable_metrics=True)
+)
 ```
-metathin/           # Core framework (stable)
-├── core/          # Five-element interfaces and main class
-└── components/    # Built-in implementations
-
-metathin_plus/      # Domain extensions – THIS IS WHERE YOU COME IN
-├── chaos/         # Chaos theory & nonlinear dynamics (physics/math)
-├── sci/           # Scientific discovery (chemistry/biology)
-└── ...            # YOUR MODULE HERE
-```
-
-**`metathin_plus` is designed to be community-driven.** If you work in a specific domain, you can add your own module and share it with everyone.
 
 ---
 
@@ -239,14 +301,18 @@ Create `metathin_plus.climate`:
 
 ---
 
-## Current Status (v0.3.0-alpha)
+## Current Status (v0.4.0)
 
 **What works:**
-- ✅ Core five-element architecture
-- ✅ All built-in components
+- ✅ Core five-element architecture (refactored)
+- ✅ All built-in components (30+)
 - ✅ Memory system (JSON/SQLite/in-memory backends, TTL, LRU)
+- ✅ Thinking pipeline with hooks
+- ✅ Configuration system (file/env/dict)
+- ✅ Builder pattern for easy agent creation
 - ✅ Chaos prediction module
 - ✅ Scientific discovery module
+- ✅ 492+ unit tests passing
 
 **Under the hood, Metathin already supports:**
 - ✅ Supervised learning (via `GradientLearning` + `expected`)
@@ -255,12 +321,12 @@ Create `metathin_plus.climate`:
 - ✅ Time series forecasting (with built-in memory for history)
 
 **What's in progress:**
-- ⚠️ API might be tweaked based on feedback
-- ⚠️ User manual is being written (yes, I'm writing it)
-- ⚠️ Edge cases need more testing
+- ⚠️ User manual is being written
+- ⚠️ More examples and tutorials
+- ⚠️ Performance optimizations
 
 **Why not on PyPI yet?**  
-I want to get feedback first, make sure the API feels right, and finish the documentation. Once stable, it'll be there.
+I want to get more feedback first, make sure the API feels right. Once stable, it'll be there.
 
 ---
 
