@@ -1,3 +1,4 @@
+
 """
 Function Library Management | 函数库管理
 =========================================
@@ -41,6 +42,7 @@ class FunctionEntry:
         expression: Symbolic expression string | 符号表达式字符串
         vector: Function vector | 函数向量
         category: Function category (math, physics, chemistry, user) | 函数类别
+        is_builtin: Whether this is a built-in function | 是否为内置函数
         parameters: List of parameter names | 参数名称列表
         tags: Search tags | 搜索标签
         description: Human-readable description | 人类可读描述
@@ -50,6 +52,7 @@ class FunctionEntry:
     expression: str
     vector: FunctionVector
     category: str = "user"
+    is_builtin: bool = False  # Explicit built-in flag | 显式内置标志
     parameters: List[str] = field(default_factory=list)
     tags: List[str] = field(default_factory=list)
     description: str = ""
@@ -66,6 +69,7 @@ class FunctionEntry:
             'expression': self.expression,
             'vector': self.vector.to_dict(),
             'category': self.category,
+            'is_builtin': self.is_builtin,
             'parameters': self.parameters,
             'tags': self.tags,
             'description': self.description,
@@ -81,6 +85,7 @@ class FunctionEntry:
             expression=data['expression'],
             vector=vector,
             category=data.get('category', 'user'),
+            is_builtin=data.get('is_builtin', False),
             parameters=data.get('parameters', []),
             tags=data.get('tags', []),
             description=data.get('description', ''),
@@ -88,7 +93,8 @@ class FunctionEntry:
         )
     
     def __repr__(self) -> str:
-        return f"FunctionEntry(name='{self.name}', category='{self.category}', dim={len(self.vector)})"
+        builtin_marker = " (builtin)" if self.is_builtin else ""
+        return f"FunctionEntry(name='{self.name}', category='{self.category}'{builtin_marker}, dim={len(self.vector)})"
 
 
 # ============================================================
@@ -113,7 +119,8 @@ class FunctionLibrary:
         - user: User-defined functions | 用户自定义函数
     """
     
-    # Built-in function definitions | 内置函数定义
+    # Built-in function definitions - Using SymPy-compatible expressions only
+    # 内置函数定义 - 仅使用 SymPy 兼容的表达式
     _MATH_FUNCTIONS = [
         # Basic functions | 基础函数
         ('constant', '1', 'math', [], ['constant', 'basic'], 'Constant function f(x) = 1'),
@@ -149,108 +156,88 @@ class FunctionLibrary:
         ('power2', 'x**2', 'math', [], ['power'], 'Square'),
         ('power3', 'x**3', 'math', [], ['power'], 'Cube'),
         
-        # Special functions | 特殊函数
+        # Special functions (using scipy/numpy compatible names) | 特殊函数
         ('erf', 'erf(x)', 'math', [], ['special', 'error'], 'Error function'),
         ('erfc', 'erfc(x)', 'math', [], ['special', 'error'], 'Complementary error function'),
         ('gamma', 'gamma(x)', 'math', [], ['special', 'gamma'], 'Gamma function'),
-        ('bessel_j0', 'besselj(0, x)', 'math', [], ['bessel', 'special'], 'Bessel function J₀'),
-        ('bessel_j1', 'besselj(1, x)', 'math', [], ['bessel', 'special'], 'Bessel function J₁'),
-        ('bessel_y0', 'bessely(0, x)', 'math', [], ['bessel', 'special'], 'Bessel function Y₀'),
     ]
     
+    # Physics functions - Simplified SymPy-compatible versions
+    # 物理函数 - 简化的 SymPy 兼容版本
     _PHYSICS_FUNCTIONS = [
-        # Oscillations | 振动
-        ('damped_oscillation', 'A*exp(-γ*x)*sin(ω*x + φ)', 'physics', 
-         ['A', 'γ', 'ω', 'φ'], ['damped', 'oscillation'], 
-         'Damped harmonic oscillation: A·e^{-γx}·sin(ωx + φ)'),
+        # Damped oscillation (using exp and sin) | 阻尼振荡
+        ('damped_oscillation', 'exp(-gamma*x)*sin(omega*x + phi)', 'physics', 
+         ['A', 'gamma', 'omega', 'phi'], ['damped', 'oscillation'], 
+         'Damped harmonic oscillation: e^{-γx}·sin(ωx + φ)'),
         
-        ('forced_oscillation', 'A*sin(ω_d*x + φ) + B*exp(-γ*x)*sin(ω_n*x)', 'physics',
-         ['A', 'ω_d', 'φ', 'B', 'γ', 'ω_n'], ['forced', 'oscillation'],
-         'Forced oscillation with damping'),
+        # Gaussian wavepacket | 高斯波包
+        ('gaussian', 'exp(-(x-x0)**2/(2*sigma**2))', 'physics',
+         ['x0', 'sigma'], ['gaussian', 'wavepacket'],
+         'Gaussian function'),
         
-        # Quantum mechanics | 量子力学
-        ('hydrogen_radial', 'r**2 * exp(-r/a0)', 'physics',
-         ['a0'], ['quantum', 'radial'],
-         'Hydrogen atom radial wavefunction (1s)'),
-        
-        ('gaussian_wavepacket', 'exp(-(x-x0)**2/(2σ**2)) * exp(i*k*x)', 'physics',
-         ['x0', 'σ', 'k'], ['quantum', 'wavepacket'],
-         'Gaussian wave packet'),
-        
-        ('lorentzian', '1/(π*γ) * 1/(1 + ((x-x0)/γ)**2)', 'physics',
-         ['x0', 'γ'], ['spectral', 'lineshape'],
+        # Lorentzian lineshape | 洛伦兹线型
+        ('lorentzian', '1/(1 + ((x-x0)/gamma)**2)', 'physics',
+         ['x0', 'gamma'], ['spectral', 'lineshape'],
          'Lorentzian lineshape'),
         
-        # Thermodynamics | 热力学
+        # Boltzmann distribution | 玻尔兹曼分布
         ('boltzmann', 'exp(-E/(k*T))', 'physics',
          ['E', 'k', 'T'], ['statistical', 'probability'],
          'Boltzmann distribution'),
         
-        ('fermi_dirac', '1/(exp((E-μ)/(k*T)) + 1)', 'physics',
-         ['μ', 'k', 'T'], ['quantum', 'statistical'],
+        # Fermi-Dirac distribution | 费米-狄拉克分布
+        ('fermi_dirac', '1/(exp((E-mu)/(k*T)) + 1)', 'physics',
+         ['mu', 'k', 'T'], ['quantum', 'statistical'],
          'Fermi-Dirac distribution'),
         
-        ('bose_einstein', '1/(exp((E-μ)/(k*T)) - 1)', 'physics',
-         ['μ', 'k', 'T'], ['quantum', 'statistical'],
+        # Bose-Einstein distribution | 玻色-爱因斯坦分布
+        ('bose_einstein', '1/(exp((E-mu)/(k*T)) - 1)', 'physics',
+         ['mu', 'k', 'T'], ['quantum', 'statistical'],
          'Bose-Einstein distribution'),
         
-        # Electromagnetism | 电磁学
-        ('coulomb', 'k*q1*q2/x**2', 'physics',
-         ['k', 'q1', 'q2'], ['electrostatic', 'inverse_square'],
-         'Coulomb\'s law'),
+        # Coulomb's law | 库仑定律
+        ('coulomb', '1/x**2', 'physics',
+         [], ['electrostatic', 'inverse_square'],
+         "Coulomb's law (1/r²)"),
         
-        ('exponential_decay_rc', 'V0*exp(-t/(R*C))', 'physics',
-         ['V0', 'R', 'C'], ['circuit', 'decay'],
+        # RC circuit decay | RC电路衰减
+        ('rc_decay', 'exp(-t/(R*C))', 'physics',
+         ['R', 'C'], ['circuit', 'decay'],
          'RC circuit discharge'),
-        
-        ('charged_particle', 'q*E*x + q*v0*B*x', 'physics',
-         ['q', 'E', 'v0', 'B'], ['electromagnetic'],
-         'Charged particle in EM field'),
     ]
     
+    # Chemistry functions - Simplified SymPy-compatible versions
+    # 化学函数 - 简化的 SymPy 兼容版本
     _CHEMISTRY_FUNCTIONS = [
-        # Kinetics | 动力学
-        ('first_order_decay', 'C0*exp(-k*t)', 'chemistry',
-         ['C0', 'k'], ['kinetics', 'decay'],
+        # First-order kinetics | 一级反应动力学
+        ('first_order_decay', 'exp(-k*t)', 'chemistry',
+         ['k'], ['kinetics', 'decay'],
          'First-order reaction kinetics'),
         
-        ('second_order_decay', '1/(1/C0 + k*t)', 'chemistry',
-         ['C0', 'k'], ['kinetics', 'decay'],
+        # Second-order kinetics | 二级反应动力学
+        ('second_order_decay', '1/(1 + k*t)', 'chemistry',
+         ['k'], ['kinetics', 'decay'],
          'Second-order reaction kinetics'),
         
+        # Michaelis-Menten | 米氏方程
         ('michaelis_menten', 'Vmax*S/(Km + S)', 'chemistry',
          ['Vmax', 'Km'], ['enzyme', 'kinetics'],
          'Michaelis-Menten enzyme kinetics'),
         
-        ('arrhenius', 'A*exp(-Ea/(R*T))', 'chemistry',
-         ['A', 'Ea', 'R'], ['kinetics', 'temperature'],
+        # Arrhenius equation | 阿伦尼乌斯方程
+        ('arrhenius', 'exp(-Ea/(R*T))', 'chemistry',
+         ['Ea', 'R'], ['kinetics', 'temperature'],
          'Arrhenius equation'),
         
-        # Adsorption | 吸附
-        ('langmuir', 'θ_max*K*C/(1 + K*C)', 'chemistry',
-         ['θ_max', 'K'], ['adsorption', 'surface'],
+        # Langmuir adsorption | 朗缪尔吸附
+        ('langmuir', 'K*C/(1 + K*C)', 'chemistry',
+         ['K'], ['adsorption', 'surface'],
          'Langmuir adsorption isotherm'),
         
-        ('freundlich', 'K_f * C**(1/n)', 'chemistry',
-         ['K_f', 'n'], ['adsorption', 'surface'],
+        # Freundlich adsorption | 弗伦德利希吸附
+        ('freundlich', 'C**(1/n)', 'chemistry',
+         ['n'], ['adsorption', 'surface'],
          'Freundlich adsorption isotherm'),
-        
-        # Thermodynamics | 热力学
-        ('van_der_waals', '(P + a*n**2/V**2)*(V - n*b) = n*R*T', 'chemistry',
-         ['a', 'b', 'n', 'R', 'T'], ['equation_of_state'],
-         'Van der Waals equation'),
-        
-        ('clausius_clapeyron', 'ln(P) = -ΔH_vap/(R*T) + C', 'chemistry',
-         ['ΔH_vap', 'R', 'C'], ['phase_equilibrium'],
-         'Clausius-Clapeyron equation'),
-        
-        ('gibbs_free', 'ΔG = ΔH - T*ΔS', 'chemistry',
-         ['ΔH', 'ΔS'], ['thermodynamics'],
-         'Gibbs free energy'),
-        
-        ('nernst', 'E = E0 - (RT/(nF))*ln(Q)', 'chemistry',
-         ['E0', 'R', 'T', 'n', 'F'], ['electrochemistry'],
-         'Nernst equation'),
     ]
     
     def __init__(self, 
@@ -283,17 +270,34 @@ class FunctionLibrary:
         self._logger.info(f"Initialized library with {len(self._entries)} functions")
     
     def _init_builtin_functions(self):
-        """Initialize built-in functions | 初始化内置函数"""
-        from sympy import symbols, sympify
+        """
+        Initialize built-in functions | 初始化内置函数
+        
+        Uses SymPy for symbolic expansion. Skips functions that fail to parse.
+        使用 SymPy 进行符号展开。跳过解析失败的函数。
+        """
+        from sympy import symbols, sympify, sin, cos, tan, asin, acos, atan
+        from sympy import sinh, cosh, tanh, exp, log, sqrt, gamma, erf, erfc
+        
+        # Define available functions for sympify | 为 sympify 定义可用函数
+        local_dict = {
+            'sin': sin, 'cos': cos, 'tan': tan, 
+            'asin': asin, 'acos': acos, 'atan': atan,
+            'sinh': sinh, 'cosh': cosh, 'tanh': tanh,
+            'exp': exp, 'log': log, 'sqrt': sqrt,
+            'gamma': gamma, 'erf': erf, 'erfc': erfc
+        }
         
         x = symbols('x')
         success_count = 0
+        fail_count = 0
         
-        # Load from file if exists, otherwise create from definitions
-        # 如果文件存在则从文件加载，否则从定义创建
+        # Try to load from file first | 优先从文件加载
         if self._builtin_path.exists():
-            self._load_from_file(self._builtin_path, is_builtin=True)
-            return
+            loaded = self._load_from_file(self._builtin_path, is_builtin=True)
+            if loaded > 0:
+                self._logger.info(f"Loaded {loaded} builtin functions from file")
+                return
         
         # Create from definitions | 从定义创建
         all_definitions = (self._MATH_FUNCTIONS + 
@@ -302,7 +306,8 @@ class FunctionLibrary:
         
         for name, expr_str, category, params, tags, desc in all_definitions:
             try:
-                expr = sympify(expr_str)
+                # Parse expression with custom locals | 使用自定义局部变量解析表达式
+                expr = sympify(expr_str, locals=local_dict)
                 vector = self.space.from_symbolic(expr, x)
                 
                 entry = FunctionEntry(
@@ -310,6 +315,7 @@ class FunctionLibrary:
                     expression=expr_str,
                     vector=vector,
                     category=category,
+                    is_builtin=True,  # Mark as built-in | 标记为内置
                     parameters=params,
                     tags=tags,
                     description=desc
@@ -318,25 +324,34 @@ class FunctionLibrary:
                 success_count += 1
                 
             except Exception as e:
-                self._logger.warning(f"Failed to add builtin {name}: {e}")
+                self._logger.debug(f"Skipped builtin {name}: {e}")
+                fail_count += 1
         
         # Save builtin functions to file | 保存内置函数到文件
-        self._save_to_file(self._builtin_path, is_builtin=True)
-        self._logger.info(f"Initialized {success_count} builtin functions")
+        if success_count > 0:
+            self._save_to_file(self._builtin_path, is_builtin=True)
+        
+        self._logger.info(f"Initialized {success_count} builtin functions (skipped {fail_count})")
     
-    def _load_from_file(self, filepath: Path, is_builtin: bool = False):
+    def _load_from_file(self, filepath: Path, is_builtin: bool = False) -> int:
         """
         Load functions from JSON file | 从 JSON 文件加载函数
         
         Args:
             filepath: Path to JSON file | JSON 文件路径
             is_builtin: Whether these are builtin functions | 是否为内置函数
+            
+        Returns:
+            int: Number of functions loaded | 加载的函数数量
         """
-        from sympy import sympify
+        from sympy import symbols
         
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 data = json.load(f)
+            
+            x = symbols('x')
+            loaded_count = 0
             
             for name, entry_data in data.items():
                 try:
@@ -357,20 +372,24 @@ class FunctionLibrary:
                         expression=entry_data.get('expression', ''),
                         vector=vector,
                         category=entry_data.get('category', 'builtin' if is_builtin else 'user'),
+                        is_builtin=entry_data.get('is_builtin', is_builtin),
                         parameters=entry_data.get('parameters', []),
                         tags=entry_data.get('tags', []),
                         description=entry_data.get('description', ''),
                         metadata=entry_data.get('metadata', {})
                     )
                     self._entries[name] = entry
+                    loaded_count += 1
                     
                 except Exception as e:
                     self._logger.warning(f"Failed to load function {name}: {e}")
             
-            self._logger.info(f"Loaded {len(data)} functions from {filepath}")
+            self._logger.info(f"Loaded {loaded_count} functions from {filepath}")
+            return loaded_count
             
         except Exception as e:
             self._logger.warning(f"Failed to load from {filepath}: {e}")
+            return 0
     
     def _save_to_file(self, filepath: Path, is_builtin: bool = False) -> bool:
         """
@@ -386,15 +405,15 @@ class FunctionLibrary:
         try:
             data = {}
             for name, entry in self._entries.items():
-                if is_builtin and entry.category == 'builtin':
+                if is_builtin and entry.is_builtin:
                     data[name] = entry.to_dict()
-                elif not is_builtin and entry.category != 'builtin':
+                elif not is_builtin and not entry.is_builtin:
                     data[name] = entry.to_dict()
             
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             
-            self._logger.info(f"Saved {len(data)} functions to {filepath}")
+            self._logger.debug(f"Saved {len(data)} functions to {filepath}")
             return True
             
         except Exception as e:
@@ -437,24 +456,26 @@ class FunctionLibrary:
         Returns:
             bool: Success status | 成功状态
         """
-        from sympy import sympify
+        from sympy import sympify, symbols
         
-        if name in self._entries and self._entries[name].category != 'user':
+        # Check if name conflicts with builtin | 检查名称是否与内置函数冲突
+        if name in self._entries and self._entries[name].is_builtin:
             self._logger.warning(f"Cannot override builtin function: {name}")
             return False
         
         try:
+            x = symbols('x')
+            
             if callable(expr):
                 # Numerical function | 数值函数
-                import numpy as np
                 x_vals = np.linspace(-5, 5, 100)
-                y_vals = [expr(x) for x in x_vals]
+                y_vals = [expr(x_val) for x_val in x_vals]
                 vector = self.space.from_samples(x_vals, y_vals)
                 expr_str = name
             else:
                 # Symbolic expression | 符号表达式
                 expr_sym = sympify(expr)
-                vector = self.space.from_symbolic(expr_sym)
+                vector = self.space.from_symbolic(expr_sym, x)
                 expr_str = str(expr)
             
             entry = FunctionEntry(
@@ -462,6 +483,7 @@ class FunctionLibrary:
                 expression=expr_str,
                 vector=vector,
                 category=category,
+                is_builtin=False,  # User functions are not built-in | 用户函数不是内置的
                 parameters=parameters or [],
                 tags=tags or [],
                 description=description,
@@ -548,6 +570,7 @@ class FunctionLibrary:
                 'name': entry.name,
                 'expression': entry.expression,
                 'category': entry.category,
+                'is_builtin': entry.is_builtin,
                 'parameters': entry.parameters,
                 'tags': entry.tags,
                 'description': entry.description
@@ -566,9 +589,11 @@ class FunctionLibrary:
             bool: Success status | 成功状态
         """
         if name not in self._entries:
+            self._logger.debug(f"Function not found: {name}")
             return False
         
-        if self._entries[name].category == 'builtin':
+        # Prevent deletion of built-in functions | 禁止删除内置函数
+        if self._entries[name].is_builtin:
             self._logger.warning(f"Cannot delete builtin function: {name}")
             return False
         
@@ -580,7 +605,7 @@ class FunctionLibrary:
     def clear_user_functions(self) -> bool:
         """Clear all user-defined functions | 清空所有用户自定义函数"""
         to_delete = [name for name, entry in self._entries.items() 
-                    if entry.category != 'builtin']
+                    if not entry.is_builtin]
         
         for name in to_delete:
             del self._entries[name]
@@ -592,13 +617,20 @@ class FunctionLibrary:
     def get_statistics(self) -> Dict[str, Any]:
         """Get library statistics | 获取库统计信息"""
         categories = {}
+        builtin_count = 0
+        user_count = 0
+        
         for entry in self._entries.values():
             categories[entry.category] = categories.get(entry.category, 0) + 1
+            if entry.is_builtin:
+                builtin_count += 1
+            else:
+                user_count += 1
         
         return {
             'total_functions': len(self._entries),
-            'builtin_count': sum(1 for e in self._entries.values() if e.category == 'builtin'),
-            'user_count': sum(1 for e in self._entries.values() if e.category == 'user'),
+            'builtin_count': builtin_count,
+            'user_count': user_count,
             'categories': categories,
             'data_directory': str(self.data_dir)
         }

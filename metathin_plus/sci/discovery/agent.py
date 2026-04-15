@@ -1,3 +1,4 @@
+# metathin_plus/sci/discovery/agent.py
 """
 Scientific Discovery Agent | 科学发现代理
 ===========================================
@@ -38,7 +39,7 @@ class DiscoveryPhase(Enum):
     """
     Discovery phase enumeration | 发现阶段枚举
     
-    States:
+    States | 状态:
         INIT: Initialization | 初始化
         COLLECTING: Collecting data | 收集数据
         EXTRACTING: Extracting vector | 提取向量
@@ -212,6 +213,21 @@ class ScientificDiscoveryAgent:
         """Current buffer size | 当前缓冲区大小"""
         return len(self._x_buffer)
     
+    @property
+    def restart_count(self) -> int:
+        """Number of restarts | 重启次数"""
+        return self._restart_count
+    
+    @property
+    def prediction_count(self) -> int:
+        """Number of predictions made | 预测次数"""
+        return self._prediction_count
+    
+    @property
+    def match_count(self) -> int:
+        """Number of successful matches | 匹配成功次数"""
+        return self._match_count
+    
     # ============================================================
     # Core Methods | 核心方法
     # ============================================================
@@ -274,6 +290,45 @@ class ScientificDiscoveryAgent:
             self._logger.debug(f"Parameter fitting failed: {e}")
             return {}
     
+    def _get_next_x(self) -> float:
+        """
+        Calculate the next x value based on current buffer | 基于当前缓冲区计算下一个 x 值
+        
+        Returns:
+            float: Next x value | 下一个 x 值
+        """
+        if len(self._x_buffer) >= 2:
+            # Calculate step size from last two points | 从最后两个点计算步长
+            step = self._x_buffer[-1] - self._x_buffer[-2]
+            return self._x_buffer[-1] + step
+        elif len(self._x_buffer) == 1:
+            # Only one point, assume step of 1 | 只有一个点，假设步长为 1
+            return self._x_buffer[-1] + 1.0
+        else:
+            # No points | 没有点
+            return 0.0
+    
+    def _linear_extrapolation(self, x_next: float) -> float:
+        """
+        Perform linear extrapolation from last two points | 从最后两个点进行线性外推
+        
+        Args:
+            x_next: Next x value | 下一个 x 值
+            
+        Returns:
+            float: Extrapolated y value | 外推的 y 值
+        """
+        if len(self._y_buffer) >= 2:
+            x1, x2 = self._x_buffer[-2], self._x_buffer[-1]
+            y1, y2 = self._y_buffer[-2], self._y_buffer[-1]
+            
+            if x2 != x1:
+                slope = (y2 - y1) / (x2 - x1)
+                return y2 + slope * (x_next - x2)
+        
+        # Fallback to last value | 回退到最后的值
+        return self._y_buffer[-1] if self._y_buffer else 0.0
+    
     def _predict_next(self, x_next: float) -> float:
         """
         Predict next value using current function | 使用当前函数预测下一个值
@@ -284,25 +339,28 @@ class ScientificDiscoveryAgent:
         Returns:
             float: Predicted value | 预测值
         """
-        if self._current_entry is None:
-            return self._y_buffer[-1] if self._y_buffer else 0.0
+        # If we have a matched function with parameters, use it
+        # 如果有匹配的函数和参数，使用它
+        if self._current_entry is not None and self._current_params:
+            try:
+                from sympy import symbols, lambdify
+                
+                x_sym = symbols('x')
+                expr = sympify(self._current_entry.expression)
+                
+                # Substitute parameters | 替换参数
+                for name, value in self._current_params.items():
+                    expr = expr.subs(symbols(name), value)
+                
+                func = lambdify(x_sym, expr, modules='numpy')
+                return float(func(x_next))
+                
+            except Exception as e:
+                self._logger.debug(f"Symbolic prediction failed: {e}")
+                # Fall through to linear extrapolation | 回退到线性外推
         
-        try:
-            from sympy import symbols, lambdify
-            
-            x_sym = symbols('x')
-            expr = sympify(self._current_entry.expression)
-            
-            # Substitute parameters | 替换参数
-            for name, value in self._current_params.items():
-                expr = expr.subs(symbols(name), value)
-            
-            func = lambdify(x_sym, expr, modules='numpy')
-            return float(func(x_next))
-            
-        except Exception as e:
-            self._logger.debug(f"Prediction failed: {e}")
-            return self._y_buffer[-1] if self._y_buffer else 0.0
+        # Use linear extrapolation as fallback | 使用线性外推作为回退
+        return self._linear_extrapolation(x_next)
     
     def _should_restart(self, predicted: float, actual: float) -> bool:
         """
@@ -316,6 +374,10 @@ class ScientificDiscoveryAgent:
             bool: Whether to restart | 是否重启
         """
         error = abs(predicted - actual)
+        # Also check relative error for small values | 对于小值也检查相对误差
+        if abs(actual) > 1e-6:
+            relative_error = error / abs(actual)
+            return error > self.error_threshold and relative_error > self.error_threshold
         return error > self.error_threshold
     
     # ============================================================
@@ -342,14 +404,22 @@ class ScientificDiscoveryAgent:
             self._x_buffer = self._x_buffer[-max_buffer:]
             self._y_buffer = self._y_buffer[-max_buffer:]
         
+        # Calculate prediction for the NEXT point after this one
+        # 计算这个点之后的下一个点的预测值
+        next_x = self._get_next_x()
+        
         # Phase 1: Collecting data | 阶段1：收集数据
         if len(self._x_buffer) < self.window_size:
             self._phase = DiscoveryPhase.COLLECTING
+            # Use linear extrapolation for prediction in collecting phase
+            # 在收集阶段使用线性外推进行预测
+            prediction = self._linear_extrapolation(next_x)
+            
             result = DiscoveryResult(
                 phase=self._phase,
                 timestamp=time.time(),
                 x=x, y=y,
-                prediction=y,
+                prediction=prediction,
                 matched_function=None,
                 similarity=0.0
             )
@@ -361,11 +431,12 @@ class ScientificDiscoveryAgent:
         vector = self._extract_vector()
         
         if vector is None:
+            prediction = self._linear_extrapolation(next_x)
             result = DiscoveryResult(
                 phase=self._phase,
                 timestamp=time.time(),
                 x=x, y=y,
-                prediction=y
+                prediction=prediction
             )
             self._history.append(result)
             return result
@@ -377,9 +448,9 @@ class ScientificDiscoveryAgent:
         matches = self.library.match(vector, self.similarity_threshold)
         
         if not matches:
-            # No match found, use persistence | 未找到匹配，使用持久性预测
+            # No match found, use linear extrapolation | 未找到匹配，使用线性外推
             self._phase = DiscoveryPhase.PREDICTING
-            prediction = self._y_buffer[-1]
+            prediction = self._linear_extrapolation(next_x)
             
             result = DiscoveryResult(
                 phase=self._phase,
@@ -407,7 +478,6 @@ class ScientificDiscoveryAgent:
         
         # Phase 5: Predicting | 阶段5：预测
         self._phase = DiscoveryPhase.PREDICTING
-        next_x = x + (x - self._x_buffer[-2]) if len(self._x_buffer) >= 2 else x + 1.0
         prediction = self._predict_next(next_x)
         
         result = DiscoveryResult(
@@ -449,19 +519,24 @@ class ScientificDiscoveryAgent:
             return False
         
         error = abs(last.prediction - y_actual)
+        
+        # Update the history record with error | 用误差更新历史记录
         last.error = error
+        self._history[-1] = last
         
         if self._should_restart(last.prediction, y_actual):
             self._logger.info(f"Error {error:.4f} > threshold {self.error_threshold}, restarting")
-            self._phase = DiscoveryPhase.RESTARTING
             self._restart_count += 1
             
-            # Reset buffers | 重置缓冲区
+            # Reset state | 重置状态
             self._x_buffer = []
             self._y_buffer = []
             self._current_entry = None
             self._current_params = {}
             self._current_vector = None
+            
+            # Set phase to RESTARTING | 设置 phase 为 RESTARTING
+            self._phase = DiscoveryPhase.RESTARTING
             
             return True
         

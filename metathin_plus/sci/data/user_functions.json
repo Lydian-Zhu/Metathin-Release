@@ -1,0 +1,184 @@
+{
+  "test_func": {
+    "name": "test_func",
+    "expression": "a*x + b",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 10,
+        "n_positive": 10,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "user",
+    "is_builtin": false,
+    "parameters": [
+      "a",
+      "b"
+    ],
+    "tags": [
+      "test"
+    ],
+    "description": "",
+    "metadata": {}
+  },
+  "pattern_test_behavior": {
+    "name": "pattern_test_behavior",
+    "expression": "x",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "user",
+    "is_builtin": false,
+    "parameters": [],
+    "tags": [
+      "pattern"
+    ],
+    "description": "",
+    "metadata": {}
+  },
+  "my_func": {
+    "name": "my_func",
+    "expression": "a*x**2 + b*x + c",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "user",
+    "is_builtin": false,
+    "parameters": [
+      "a",
+      "b",
+      "c"
+    ],
+    "tags": [
+      "custom"
+    ],
+    "description": "",
+    "metadata": {}
+  },
+  "pattern_behavior1": {
+    "name": "pattern_behavior1",
+    "expression": "sin(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.16666666666666666,
+        0.0,
+        0.008333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "user",
+    "is_builtin": false,
+    "parameters": [],
+    "tags": [
+      "pattern"
+    ],
+    "description": "",
+    "metadata": {}
+  },
+  "pattern_behavior2": {
+    "name": "pattern_behavior2",
+    "expression": "cos(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.5,
+        0.0,
+        0.041666666666666664,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "user",
+    "is_builtin": false,
+    "parameters": [],
+    "tags": [
+      "pattern"
+    ],
+    "description": "",
+    "metadata": {}
+  }
+}

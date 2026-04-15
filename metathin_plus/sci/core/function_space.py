@@ -1,3 +1,4 @@
+
 """
 Laurent Series Function Space | 洛朗级数向量空间
 ===================================================
@@ -12,7 +13,7 @@ Mathematical Foundation | 数学基础:
         \vec{f} = [a_{-N}, ..., a_{-1}, a_0, a_1, ..., a_{N}]
     
     Similarity | 相似度:
-        r = \frac{\vec{f} \cdot \vec{g}}{\|\vec{f}\| \|\vec{g}\|}
+        r = (a·b) / (|a|·|b|)
 
 Design Principles | 设计原则:
     - Pure mathematics, no Metathin dependency | 纯数学，无 Metathin 依赖
@@ -198,9 +199,9 @@ class FunctionSpace:
     管理函数与向量之间的映射。
     
     Operations | 操作:
-        - Symbolic expression → Vector | 符号表达式 → 向量
-        - Numerical samples → Vector | 数值采样 → 向量
-        - Vector → Callable function | 向量 → 可调用函数
+        - Symbolic expression -> Vector | 符号表达式 -> 向量
+        - Numerical samples -> Vector | 数值采样 -> 向量
+        - Vector -> Callable function | 向量 -> 可调用函数
         - Linear combinations | 线性组合
     """
     
@@ -228,7 +229,7 @@ class FunctionSpace:
         Returns:
             FunctionVector: Vector representation | 向量表示
         """
-        from sympy import symbols, limit, factorial
+        from sympy import symbols, limit, factorial, oo
         
         if x_symbol is None:
             x_symbol = symbols('x')
@@ -239,9 +240,14 @@ class FunctionSpace:
         # Negative power terms | 负幂项
         for n in range(1, self.config.n_negative + 1):
             try:
+                # Compute residue: a_{-n} = lim_{x->c} (x-c)^n * f(x)
                 term = (x_symbol - center) ** n * expr
                 val = limit(term, x_symbol, center)
-                coeffs.append(float(val) if hasattr(val, 'is_number') and val.is_number else 0.0)
+                # Handle infinite limits | 处理无穷极限
+                if val == oo or val == -oo:
+                    coeffs.append(0.0)
+                else:
+                    coeffs.append(float(val) if hasattr(val, 'is_number') and val.is_number else 0.0)
             except Exception:
                 coeffs.append(0.0)
         
@@ -286,7 +292,12 @@ class FunctionSpace:
             dx = x - self.config.center
             for j in range(dim):
                 power = j - self.config.n_negative
-                A[i, j] = dx ** power
+                # Avoid division by zero for negative powers near center
+                # 避免中心点附近的负幂除零
+                if power < 0 and abs(dx) < self.config.eps:
+                    A[i, j] = 0.0
+                else:
+                    A[i, j] = dx ** power
         
         try:
             coeffs, _, _, _ = np.linalg.lstsq(A, y_vals, rcond=None)
@@ -314,6 +325,9 @@ class FunctionSpace:
             result = 0.0
             for j, coeff in enumerate(coeffs):
                 power = j - n_neg
+                # Handle negative powers near center | 处理中心点附近的负幂
+                if power < 0 and abs(dx) < self.config.eps:
+                    continue
                 result += coeff * (dx ** power)
             return result
         

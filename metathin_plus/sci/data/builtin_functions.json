@@ -1,0 +1,1315 @@
+{
+  "constant": {
+    "name": "constant",
+    "expression": "1",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "constant",
+      "basic"
+    ],
+    "description": "Constant function f(x) = 1",
+    "metadata": {}
+  },
+  "linear": {
+    "name": "linear",
+    "expression": "x",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "linear",
+      "polynomial"
+    ],
+    "description": "Linear function f(x) = x",
+    "metadata": {}
+  },
+  "quadratic": {
+    "name": "quadratic",
+    "expression": "x**2",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "quadratic",
+      "polynomial"
+    ],
+    "description": "Quadratic function f(x) = x²",
+    "metadata": {}
+  },
+  "cubic": {
+    "name": "cubic",
+    "expression": "x**3",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "cubic",
+      "polynomial"
+    ],
+    "description": "Cubic function f(x) = x³",
+    "metadata": {}
+  },
+  "inverse": {
+    "name": "inverse",
+    "expression": "1/x",
+    "vector": {
+      "coefficients": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "inverse",
+      "rational"
+    ],
+    "description": "Inverse function f(x) = 1/x",
+    "metadata": {}
+  },
+  "inverse_square": {
+    "name": "inverse_square",
+    "expression": "1/x**2",
+    "vector": {
+      "coefficients": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "inverse",
+      "rational"
+    ],
+    "description": "Inverse square f(x) = 1/x²",
+    "metadata": {}
+  },
+  "sin": {
+    "name": "sin",
+    "expression": "sin(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.16666666666666666,
+        0.0,
+        0.008333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "trigonometric",
+      "periodic"
+    ],
+    "description": "Sine function",
+    "metadata": {}
+  },
+  "cos": {
+    "name": "cos",
+    "expression": "cos(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.5,
+        0.0,
+        0.041666666666666664,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "trigonometric",
+      "periodic"
+    ],
+    "description": "Cosine function",
+    "metadata": {}
+  },
+  "tan": {
+    "name": "tan",
+    "expression": "tan(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.3333333333333333,
+        0.0,
+        0.13333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "trigonometric",
+      "periodic"
+    ],
+    "description": "Tangent function",
+    "metadata": {}
+  },
+  "arcsin": {
+    "name": "arcsin",
+    "expression": "asin(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.16666666666666666,
+        0.0,
+        0.075
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "trigonometric",
+      "inverse"
+    ],
+    "description": "Arcsine function",
+    "metadata": {}
+  },
+  "arccos": {
+    "name": "arccos",
+    "expression": "acos(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        -1.0,
+        0.0,
+        -0.16666666666666666,
+        0.0,
+        -0.075
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "trigonometric",
+      "inverse"
+    ],
+    "description": "Arccosine function",
+    "metadata": {}
+  },
+  "arctan": {
+    "name": "arctan",
+    "expression": "atan(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.3333333333333333,
+        0.0,
+        0.2
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "trigonometric",
+      "inverse"
+    ],
+    "description": "Arctangent function",
+    "metadata": {}
+  },
+  "sinh": {
+    "name": "sinh",
+    "expression": "sinh(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.16666666666666666,
+        0.0,
+        0.008333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "hyperbolic"
+    ],
+    "description": "Hyperbolic sine",
+    "metadata": {}
+  },
+  "cosh": {
+    "name": "cosh",
+    "expression": "cosh(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.5,
+        0.0,
+        0.041666666666666664,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "hyperbolic"
+    ],
+    "description": "Hyperbolic cosine",
+    "metadata": {}
+  },
+  "tanh": {
+    "name": "tanh",
+    "expression": "tanh(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.3333333333333333,
+        0.0,
+        0.13333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "hyperbolic"
+    ],
+    "description": "Hyperbolic tangent",
+    "metadata": {}
+  },
+  "exp": {
+    "name": "exp",
+    "expression": "exp(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.5,
+        0.16666666666666666,
+        0.041666666666666664,
+        0.008333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "exponential",
+      "growth"
+    ],
+    "description": "Exponential function",
+    "metadata": {}
+  },
+  "exp_decay": {
+    "name": "exp_decay",
+    "expression": "exp(-x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0,
+        0.5,
+        -0.16666666666666666,
+        0.041666666666666664,
+        -0.008333333333333333
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "exponential",
+      "decay"
+    ],
+    "description": "Exponential decay",
+    "metadata": {}
+  },
+  "ln": {
+    "name": "ln",
+    "expression": "log(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "logarithmic"
+    ],
+    "description": "Natural logarithm",
+    "metadata": {}
+  },
+  "log10": {
+    "name": "log10",
+    "expression": "log(x,10)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "logarithmic"
+    ],
+    "description": "Base-10 logarithm",
+    "metadata": {}
+  },
+  "log2": {
+    "name": "log2",
+    "expression": "log(x,2)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "logarithmic"
+    ],
+    "description": "Base-2 logarithm",
+    "metadata": {}
+  },
+  "sqrt": {
+    "name": "sqrt",
+    "expression": "sqrt(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "power",
+      "root"
+    ],
+    "description": "Square root",
+    "metadata": {}
+  },
+  "cbrt": {
+    "name": "cbrt",
+    "expression": "x**(1/3)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "power",
+      "root"
+    ],
+    "description": "Cube root",
+    "metadata": {}
+  },
+  "power2": {
+    "name": "power2",
+    "expression": "x**2",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "power"
+    ],
+    "description": "Square",
+    "metadata": {}
+  },
+  "power3": {
+    "name": "power3",
+    "expression": "x**3",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "power"
+    ],
+    "description": "Cube",
+    "metadata": {}
+  },
+  "erf": {
+    "name": "erf",
+    "expression": "erf(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.1283791670955126,
+        0.0,
+        -0.37612638903183754,
+        0.0,
+        0.11283791670955126
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "special",
+      "error"
+    ],
+    "description": "Error function",
+    "metadata": {}
+  },
+  "erfc": {
+    "name": "erfc",
+    "expression": "erfc(x)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.1283791670955126,
+        0.0,
+        0.37612638903183754,
+        0.0,
+        -0.11283791670955126
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "special",
+      "error"
+    ],
+    "description": "Complementary error function",
+    "metadata": {}
+  },
+  "gamma": {
+    "name": "gamma",
+    "expression": "gamma(x)",
+    "vector": {
+      "coefficients": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "math",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "special",
+      "gamma"
+    ],
+    "description": "Gamma function",
+    "metadata": {}
+  },
+  "gaussian": {
+    "name": "gaussian",
+    "expression": "exp(-(x-x0)**2/(2*sigma**2))",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "physics",
+    "is_builtin": true,
+    "parameters": [
+      "x0",
+      "sigma"
+    ],
+    "tags": [
+      "gaussian",
+      "wavepacket"
+    ],
+    "description": "Gaussian function",
+    "metadata": {}
+  },
+  "boltzmann": {
+    "name": "boltzmann",
+    "expression": "exp(-E/(k*T))",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "physics",
+    "is_builtin": true,
+    "parameters": [
+      "E",
+      "k",
+      "T"
+    ],
+    "tags": [
+      "statistical",
+      "probability"
+    ],
+    "description": "Boltzmann distribution",
+    "metadata": {}
+  },
+  "fermi_dirac": {
+    "name": "fermi_dirac",
+    "expression": "1/(exp((E-mu)/(k*T)) + 1)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "physics",
+    "is_builtin": true,
+    "parameters": [
+      "mu",
+      "k",
+      "T"
+    ],
+    "tags": [
+      "quantum",
+      "statistical"
+    ],
+    "description": "Fermi-Dirac distribution",
+    "metadata": {}
+  },
+  "bose_einstein": {
+    "name": "bose_einstein",
+    "expression": "1/(exp((E-mu)/(k*T)) - 1)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "physics",
+    "is_builtin": true,
+    "parameters": [
+      "mu",
+      "k",
+      "T"
+    ],
+    "tags": [
+      "quantum",
+      "statistical"
+    ],
+    "description": "Bose-Einstein distribution",
+    "metadata": {}
+  },
+  "coulomb": {
+    "name": "coulomb",
+    "expression": "1/x**2",
+    "vector": {
+      "coefficients": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "physics",
+    "is_builtin": true,
+    "parameters": [],
+    "tags": [
+      "electrostatic",
+      "inverse_square"
+    ],
+    "description": "Coulomb's law (1/r²)",
+    "metadata": {}
+  },
+  "rc_decay": {
+    "name": "rc_decay",
+    "expression": "exp(-t/(R*C))",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "physics",
+    "is_builtin": true,
+    "parameters": [
+      "R",
+      "C"
+    ],
+    "tags": [
+      "circuit",
+      "decay"
+    ],
+    "description": "RC circuit discharge",
+    "metadata": {}
+  },
+  "first_order_decay": {
+    "name": "first_order_decay",
+    "expression": "exp(-k*t)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "chemistry",
+    "is_builtin": true,
+    "parameters": [
+      "k"
+    ],
+    "tags": [
+      "kinetics",
+      "decay"
+    ],
+    "description": "First-order reaction kinetics",
+    "metadata": {}
+  },
+  "second_order_decay": {
+    "name": "second_order_decay",
+    "expression": "1/(1 + k*t)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "chemistry",
+    "is_builtin": true,
+    "parameters": [
+      "k"
+    ],
+    "tags": [
+      "kinetics",
+      "decay"
+    ],
+    "description": "Second-order reaction kinetics",
+    "metadata": {}
+  },
+  "arrhenius": {
+    "name": "arrhenius",
+    "expression": "exp(-Ea/(R*T))",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "chemistry",
+    "is_builtin": true,
+    "parameters": [
+      "Ea",
+      "R"
+    ],
+    "tags": [
+      "kinetics",
+      "temperature"
+    ],
+    "description": "Arrhenius equation",
+    "metadata": {}
+  },
+  "langmuir": {
+    "name": "langmuir",
+    "expression": "K*C/(1 + K*C)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "chemistry",
+    "is_builtin": true,
+    "parameters": [
+      "K"
+    ],
+    "tags": [
+      "adsorption",
+      "surface"
+    ],
+    "description": "Langmuir adsorption isotherm",
+    "metadata": {}
+  },
+  "freundlich": {
+    "name": "freundlich",
+    "expression": "C**(1/n)",
+    "vector": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "config": {
+        "n_negative": 5,
+        "n_positive": 5,
+        "center": 0.0,
+        "eps": 1e-10
+      }
+    },
+    "category": "chemistry",
+    "is_builtin": true,
+    "parameters": [
+      "n"
+    ],
+    "tags": [
+      "adsorption",
+      "surface"
+    ],
+    "description": "Freundlich adsorption isotherm",
+    "metadata": {}
+  }
+}
