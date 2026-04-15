@@ -81,7 +81,7 @@ class MetaChaos:
         behaviors: Optional[List[str]] = None,
         decision_strategy: str = "min_error",
         decision_params: Optional[Dict[str, Any]] = None,
-        selector_error_window: int = 10,
+        selector_error_window: int = 10,  # 保留兼容，但新选择器不再使用
         enable_learning: bool = True,
         learning_type: str = "error",
         learning_rate: float = 0.1,
@@ -131,6 +131,9 @@ class MetaChaos:
             name=f"{name}_pattern"
         )
         
+        # 获取特征维度
+        self.feature_dim = self.pattern_space.get_feature_dimension()
+        
         # ============================================================
         # 2. Behaviors (B) | 行动层
         # ============================================================
@@ -139,12 +142,16 @@ class MetaChaos:
         self._init_behaviors(behaviors, memory_size)
         
         # ============================================================
-        # 3. Selector (S) | 评估层
+        # 3. Selector (S) | 评估层 - 使用新的基于特征的选择器
         # ============================================================
+        from .selector import ChaosSelector
         self.selector = ChaosSelector(
-            error_window=selector_error_window,
-            use_confidence=True,
-            default_fitness=0.5
+            n_features=self.feature_dim,
+            n_behaviors=len(self.behaviors) if self.behaviors else None,
+            learning_rate=learning_rate,
+            temperature=1.0,
+            use_history=True,
+            history_weight=0.3
         )
         
         # ============================================================
@@ -153,6 +160,7 @@ class MetaChaos:
         self.decision_strategy = self._create_decision_strategy(
             decision_strategy, decision_params
         )
+        
         
         # ============================================================
         # 5. Learning Mechanism (Ψ) | 学习层

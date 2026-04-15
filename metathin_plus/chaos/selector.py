@@ -1,23 +1,25 @@
-# metathin_plus/chaos/selector.py - 修复循环导入
+# metathin_plus/chaos/selector.py - 完整修复版本
 
 """
 Chaos Selector (S) | 混沌选择器 (S)
 ====================================
 
-Evaluates fitness of each prediction behavior.
-评估每个预测行为的适应度。
+Evaluates fitness of each prediction behavior based on current features.
+基于当前特征评估每个预测行为的适应度。
+
+核心改进：
+    - 使用特征向量计算适应度，而非简单历史平均
+    - 支持在线学习和权重更新
+    - 不同特征输入产生不同适应度分数
 """
 
+import numpy as np
 import logging
 from typing import Dict, List, Optional
-import numpy as np
 
 from metathin.core.s_selector import Selector
 from metathin.core.b_behavior import MetaBehavior
 from metathin.core.types import FeatureVector, FitnessScore, ParameterDict
-
-# 移除循环导入 - 只导入需要的类型
-from .base import PredictionResult
 
 
 class ChaosSelector(Selector):
@@ -25,141 +27,206 @@ class ChaosSelector(Selector):
     Chaos Selector - S component for chaos prediction.
     混沌选择器 - 混沌预测的评估层组件。
     
-    Evaluates behavior fitness based on recent prediction accuracy.
-    基于近期预测准确率评估行为适应度。
+    核心公式:
+        fitness_i = sigmoid(w_i · features + b_i)
     
-    Fitness = 1 / (1 + recent_error) * confidence_factor
+    这样选择器可以根据当前系统状态的特征，
+    动态判断哪个行为更合适。
     """
     
     def __init__(
         self,
-        error_window: int = 10,
-        use_confidence: bool = True,
-        default_fitness: float = 0.5
+        n_features: int = 7,
+        n_behaviors: Optional[int] = None,
+        learning_rate: float = 0.01,
+        temperature: float = 1.0,
+        use_history: bool = True,
+        history_weight: float = 0.3
     ):
         """
         Initialize chaos selector.
         初始化混沌选择器。
         
         Args:
-            error_window: Window for error calculation | 误差计算窗口
-            use_confidence: Include behavior confidence in fitness | 是否包含行为置信度
-            default_fitness: Default fitness for new behaviors | 新行为的默认适应度
+            n_features: Feature vector dimension | 特征向量维度
+            n_behaviors: Number of behaviors (optional) | 行为数量
+            learning_rate: Learning rate for weight updates | 学习率
+            temperature: Sigmoid temperature | Sigmoid 温度参数
+            use_history: Whether to use historical error | 是否使用历史误差
+            history_weight: Weight for historical error (0-1) | 历史误差权重
         """
         super().__init__()
-        self.error_window = error_window
-        self.use_confidence = use_confidence
-        self.default_fitness = default_fitness
         
-        # Store behavior errors | 存储行为误差
-        self._behavior_errors: Dict[str, List[float]] = {}
-        self._behavior_confidences: Dict[str, List[float]] = {}
+        self.n_features = n_features
+        self.learning_rate = learning_rate
+        self.temperature = temperature
+        self.use_history = use_history
+        self.history_weight = history_weight
+        
+        # Behavior index mapping | 行为索引映射
+        self._behavior_indices: Dict[str, int] = {}
+        
+        # Weight matrix [n_behaviors, n_features] | 权重矩阵
+        self.weights: Optional[np.ndarray] = None
+        self.bias: Optional[np.ndarray] = None
+        
+        # Initialize if number of behaviors is known | 如果知道行为数量则初始化
+        if n_behaviors is not None:
+            self.weights = np.random.randn(n_behaviors, n_features) * 0.1
+            self.bias = np.zeros(n_behaviors)
+        
+        # Historical prediction errors | 历史预测误差
+        self._prediction_errors: Dict[str, List[float]] = {}
+        
         self._logger = logging.getLogger("metathin_plus.chaos.selector.ChaosSelector")
     
-    def record_prediction(
-        self,
-        behavior_name: str,
-        prediction: Optional[PredictionResult],
-        actual_value: float
-    ) -> None:
-        """
-        Record prediction result for fitness calculation.
-        记录预测结果用于适应度计算。
+    def _get_or_create_index(self, behavior_name: str) -> int:
+        """Get or create behavior index | 获取或创建行为索引"""
+        if behavior_name in self._behavior_indices:
+            return self._behavior_indices[behavior_name]
         
-        Args:
-            behavior_name: Name of the behavior | 行为名称
-            prediction: Prediction result (can be None for initial state) | 预测结果
-            actual_value: Actual observed value | 实际观测值
-        """
-        # 处理 prediction 为 None 的情况
-        if prediction is None:
-            self._logger.debug(f"Prediction is None for {behavior_name}, skipping")
-            return
+        idx = len(self._behavior_indices)
+        self._behavior_indices[behavior_name] = idx
         
-        # 计算误差
-        error = abs(prediction.value - actual_value)
+        # Dynamically expand weight matrix | 动态扩展权重矩阵
+        if self.weights is None:
+            self.weights = np.random.randn(idx + 1, self.n_features) * 0.1
+            self.bias = np.zeros(idx + 1)
+        elif idx >= len(self.weights):
+            new_weights = np.vstack([
+                self.weights,
+                np.random.randn(idx + 1 - len(self.weights), self.n_features) * 0.1
+            ])
+            self.weights = new_weights
+            new_bias = np.append(self.bias, np.zeros(idx + 1 - len(self.bias)))
+            self.bias = new_bias
         
-        if behavior_name not in self._behavior_errors:
-            self._behavior_errors[behavior_name] = []
-            self._behavior_confidences[behavior_name] = []
-        
-        self._behavior_errors[behavior_name].append(error)
-        self._behavior_confidences[behavior_name].append(prediction.confidence)
-        
-        # Limit history | 限制历史
-        if len(self._behavior_errors[behavior_name]) > 1000:
-            self._behavior_errors[behavior_name] = self._behavior_errors[behavior_name][-1000:]
-            self._behavior_confidences[behavior_name] = self._behavior_confidences[behavior_name][-1000:]
+        return idx
     
-    def compute_fitness(
-        self,
-        behavior: MetaBehavior,
-        features: FeatureVector
-    ) -> FitnessScore:
-        """
-        Compute fitness for a behavior.
-        计算行为的适应度。
-        
-        Fitness = (1 - normalized_error) * confidence_factor
-        
-        Args:
-            behavior: Behavior to evaluate | 要评估的行为
-            features: Feature vector | 特征向量
-            
-        Returns:
-            FitnessScore: Fitness in [0, 1] | [0, 1] 范围内的适应度
-        """
-        behavior_name = behavior.name
-        
-        # Get recent errors | 获取近期误差
-        errors = self._behavior_errors.get(behavior_name, [])
-        confidences = self._behavior_confidences.get(behavior_name, [])
-        
-        if not errors:
-            # 没有历史数据，使用默认适应度
-            fitness = self.default_fitness
-            self._logger.debug(f"No history for {behavior_name}, using default fitness={fitness}")
-        else:
-            # Calculate recent error | 计算近期误差
-            recent_errors = errors[-self.error_window:] if len(errors) > self.error_window else errors
-            avg_error = np.mean(recent_errors)
-            
-            # Convert error to fitness (error ~ 0 -> fitness ~ 1) | 误差转适应度
-            error_fitness = 1.0 / (1.0 + avg_error)
-            
-            # Calculate average confidence | 计算平均置信度
-            if self.use_confidence and confidences:
-                recent_conf = confidences[-self.error_window:] if len(confidences) > self.error_window else confidences
-                avg_confidence = np.mean(recent_conf)
+    def _ensure_feature_dimension(self, features: FeatureVector) -> FeatureVector:
+        """Ensure feature dimension matches n_features | 确保特征维度匹配"""
+        if len(features) != self.n_features:
+            if len(features) > self.n_features:
+                return features[:self.n_features]
             else:
-                avg_confidence = 0.5
-            
-            # Combine | 组合
-            fitness = 0.7 * error_fitness + 0.3 * avg_confidence
-            
-            self._logger.debug(f"{behavior_name}: avg_error={avg_error:.4f}, "
-                              f"error_fitness={error_fitness:.4f}, "
-                              f"fitness={fitness:.4f}")
+                return np.pad(features, (0, self.n_features - len(features)))
+        return features
+    
+    def compute_fitness(self, behavior: MetaBehavior, features: FeatureVector) -> FitnessScore:
+        """
+        Compute fitness based on current features.
+        基于当前特征计算适应度。
+        
+        核心公式: fitness = sigmoid((w·x + b) / temperature)
+        """
+        idx = self._get_or_create_index(behavior.name)
+        
+        # Ensure feature dimension | 确保特征维度
+        features = self._ensure_feature_dimension(features)
+        
+        # Compute linear combination | 计算线性组合
+        z = np.dot(self.weights[idx], features) + self.bias[idx]
+        
+        # Sigmoid activation | Sigmoid 激活
+        fitness = 1.0 / (1.0 + np.exp(-z / self.temperature))
+        
+        # Optionally blend with historical error | 可选：结合历史误差
+        if self.use_history and behavior.name in self._prediction_errors:
+            errors = self._prediction_errors[behavior.name]
+            if errors:
+                recent_errors = errors[-20:]  # Last 20 errors
+                avg_error = np.mean(recent_errors)
+                error_fitness = 1.0 / (1.0 + avg_error)
+                # Blend: feature-based + history-based | 混合：基于特征 + 基于历史
+                fitness = (1 - self.history_weight) * fitness + self.history_weight * error_fitness
         
         fitness = float(np.clip(fitness, 0.0, 1.0))
-        self.record_fitness(behavior_name, fitness)
+        
+        self._logger.debug(f"{behavior.name}: z={z:.3f}, fitness={fitness:.3f}")
         
         return fitness
     
-    def get_behavior_error(self, behavior_name: str) -> Optional[float]:
-        """Get recent error for a behavior | 获取行为的近期误差"""
-        errors = self._behavior_errors.get(behavior_name, [])
-        if not errors:
-            return None
-        window = min(self.error_window, len(errors))
-        return float(np.mean(errors[-window:]))
+    def record_prediction_error(self, behavior_name: str, error: float):
+        """
+        Record prediction error for learning.
+        记录预测误差用于学习。
+        """
+        if behavior_name not in self._prediction_errors:
+            self._prediction_errors[behavior_name] = []
+        self._prediction_errors[behavior_name].append(error)
+        
+        # Limit history length | 限制历史长度
+        if len(self._prediction_errors[behavior_name]) > 100:
+            self._prediction_errors[behavior_name] = self._prediction_errors[behavior_name][-100:]
     
-    def reset(self) -> None:
-        """Reset all recorded data | 重置所有记录数据"""
-        self._behavior_errors.clear()
-        self._behavior_confidences.clear()
-        self.reset_history()
+    def record_prediction(self, behavior_name: str, prediction, actual_value: float):
+        """
+        Record prediction result (compatibility with old interface).
+        记录预测结果（兼容旧接口）。
+        """
+        # Extract prediction value | 提取预测值
+        if hasattr(prediction, 'value'):
+            pred_value = prediction.value
+        else:
+            pred_value = prediction
+        
+        error = abs(pred_value - actual_value)
+        self.record_prediction_error(behavior_name, error)
+    
+    def update_parameters(self, delta: ParameterDict) -> None:
+        """
+        Update weights based on learning feedback.
+        基于学习反馈更新权重。
+        """
+        for key, value in delta.items():
+            if key.startswith('w_'):
+                parts = key.split('_')
+                if len(parts) == 3:
+                    try:
+                        i, j = int(parts[1]), int(parts[2])
+                        if self.weights is not None and i < len(self.weights) and j < self.weights.shape[1]:
+                            self.weights[i, j] += value
+                    except (ValueError, IndexError):
+                        pass
+            elif key.startswith('b_'):
+                try:
+                    i = int(key.split('_')[1])
+                    if self.bias is not None and i < len(self.bias):
+                        self.bias[i] += value
+                except (ValueError, IndexError):
+                    pass
     
     def get_parameters(self) -> ParameterDict:
-        """Get learnable parameters | 获取可学习参数"""
-        return {}  # No learnable parameters | 无可学习参数
+        """Get current parameters | 获取当前参数"""
+        params = {}
+        if self.weights is not None:
+            for i in range(len(self.weights)):
+                for j in range(self.weights.shape[1]):
+                    params[f'w_{i}_{j}'] = float(self.weights[i, j])
+        if self.bias is not None:
+            for i in range(len(self.bias)):
+                params[f'b_{i}'] = float(self.bias[i])
+        return params
+    
+    def get_behavior_error(self, behavior_name: str) -> Optional[float]:
+        """Get recent average error for a behavior | 获取行为的近期平均误差"""
+        errors = self._prediction_errors.get(behavior_name, [])
+        if not errors:
+            return None
+        return float(np.mean(errors[-10:]))
+    
+    def reset(self) -> None:
+        """Reset selector state | 重置选择器状态"""
+        self._prediction_errors.clear()
+        self.reset_history()
+    
+    def get_feature_importance(self) -> Dict[str, float]:
+        """
+        Get feature importance (average absolute weight).
+        获取特征重要性（平均绝对权重）。
+        """
+        if self.weights is None:
+            return {}
+        
+        importance = np.mean(np.abs(self.weights), axis=0)
+        return {f"feature_{i}": float(imp) for i, imp in enumerate(importance)}
