@@ -6,12 +6,10 @@ Metathin 生态系统安装配置
 
 This package includes:
     - metathin: Core cognitive agent framework 
-    - metathin_plus.chaos: Chaos theory and time series forecasting
     - metathin_plus.sci: Scientific discovery and pattern extraction 
 
 本包包含：
     - metathin：核心认知代理框架
-    - metathin_plus.chaos：混沌理论与时间序列预测
     - metathin_plus.sci：科学发现与模式提取
 
 Author | 作者: Lydian-Zhu
@@ -49,12 +47,6 @@ except FileNotFoundError:
 # 核心依赖（所有安装都需要）
 core_requires = [
     "numpy>=1.19.0",           # Fundamental package for numerical computing | 数值计算基础包
-]
-
-# Chaos module dependencies | 混沌模块依赖
-chaos_requires = [
-    "scipy>=1.5.0",            # Scientific computing | 科学计算
-    "scikit-learn>=0.24.0",    # Machine learning tools | 机器学习工具
 ]
 
 # Scientific discovery module dependencies | 科学发现模块依赖
@@ -120,9 +112,6 @@ extras = {
     # Core framework | 核心框架
     "core": core_requires,
     
-    # Chaos module | 混沌模块
-    "chaos": chaos_requires,
-    
     # Scientific discovery module | 科学发现模块
     "sci": sci_requires,
     
@@ -151,7 +140,6 @@ extras = {
     # Full installation (all modules)
     # 完整安装（所有模块）
     "full": (core_requires + 
-             chaos_requires + 
              sci_requires + 
              viz_requires + 
              data_requires + 
@@ -250,9 +238,8 @@ setup(
         "ai", "artificial-intelligence", "cognitive-architecture",
         "agent", "agent-framework", "machine-learning",
         "metacognition", "cognitive-science",
-        "chaos-theory", "nonlinear-dynamics", "time-series",
-        "forecasting", "prediction",
         "scientific-discovery", "symbolic-regression",
+        "time-series", "forecasting", "prediction",
         "pytorch", "scikit-learn", "scientific-computing",
         "physics", "mathematics", "research"
     ]),
@@ -299,9 +286,6 @@ Installation Examples | 安装示例:
 
     # Core only | 仅核心
     pip install metathin
-    
-    # With chaos module | 带混沌模块
-    pip install metathin[chaos]
     
     # With scientific discovery | 带科学发现模块
     pip install metathin[sci]

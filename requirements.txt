@@ -1,3 +1,7 @@
+
+## 修正后的 requirements.txt
+
+```python
 """
 Metathin Dependency Management
 ==============================
@@ -6,7 +10,6 @@ Metathin 依赖管理
 
 Installation commands | 安装命令:
     pip install metathin                    # Install core only | 仅安装核心
-    pip install metathin[chaos]             # Install with chaos module | 带混沌模块安装
     pip install metathin[sci]               # Install with scientific discovery | 带科学发现模块安装
     pip install metathin[deep]              # Install with deep learning support | 带深度学习支持安装
     pip install metathin[viz]               # Install with visualization tools | 带可视化工具安装
@@ -28,19 +31,6 @@ Version | 版本: 0.4.0
 # 运行 Metathin 核心所需的最小依赖
 # ------------------------------------------------------------
 numpy>=1.19.0                # Fundamental package for numerical computing | 数值计算基础包
-
-
-# ============================================================
-# Chaos Module Dependencies
-# 混沌模块依赖
-# ============================================================
-# Install with: pip install metathin[chaos]
-# 安装命令：pip install metathin[chaos]
-# Provides chaos theory tools and nonlinear time series forecasting
-# 提供混沌理论工具和非线性时间序列预测
-# ------------------------------------------------------------
-scipy>=1.5.0                 # Scientific computing (signal processing, optimization) | 科学计算（信号处理、优化）
-scikit-learn>=0.24.0         # Machine learning tools (preprocessing, metrics) | 机器学习工具（预处理、指标）
 
 
 # ============================================================
@@ -159,8 +149,8 @@ sphinx-rtd-theme>=1.0.0      # ReadTheDocs theme | ReadTheDocs 主题
 # ============================================================
 # Install with: pip install metathin[full]
 # 安装命令：pip install metathin[full]
-# Includes: core + chaos + sci + viz + data + yaml
-# 包含：核心 + 混沌 + 科学发现 + 可视化 + 数据处理 + YAML 支持
+# Includes: core + sci + viz + data + yaml
+# 包含：核心 + 科学发现 + 可视化 + 数据处理 + YAML 支持
 # ------------------------------------------------------------
 # (No direct dependencies - this is a meta-package)
 # （无直接依赖 - 这是一个元包）

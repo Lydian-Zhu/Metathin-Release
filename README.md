@@ -5,7 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Lydian-Zhu/Metathin-Release/pulls)
-[![Tests](https://img.shields.io/badge/tests-492%20passed-brightgreen.svg)](https://github.com/Lydian-Zhu/Metathin-Release/pulls)
 
 ---
 
@@ -25,10 +24,9 @@ I started this project for my physics experiment data processing, and later real
 ## The Core Idea
 
 No matter what kind of agent you're building—a chatbot, a lab assistant, or a prediction model—its thinking process can be described with five elements:
-
-```
 Metathin = (P, B, S, D, Ψ)
-```
+
+text
 
 - **P (PatternSpace)** – Perception: turns raw input into feature vectors  
 - **B (MetaBehavior)** – Action: executable skill units  
@@ -48,24 +46,21 @@ The framework's real value is in the **interfaces**:
 
 ```python
 from metathin.core import PatternSpace, MetaBehavior, Selector, DecisionStrategy, LearningMechanism
-```
-
 You can:
-- Use what I provide (quick start)
-- Implement your own algorithms (full control)
-- Mix and match (bring your own Selector, use my Behaviors)
 
-**The interfaces are designed to be minimal and flexible.** They don't force you into any specific implementation. You bring your domain expertise, the framework handles the orchestration.
+Use what I provide (quick start)
 
-### AI? Feel Free to Ask It
+Implement your own algorithms (full control)
 
-The project structure is clean, the interfaces are well-documented, and the type hints are everywhere. If you paste this code into an AI assistant and say *"Help me implement a custom Selector for my problem"*, it'll probably know what to do. I've designed it that way on purpose.
+Mix and match (bring your own Selector, use my Behaviors)
 
----
+The interfaces are designed to be minimal and flexible. They don't force you into any specific implementation. You bring your domain expertise, the framework handles the orchestration.
 
-## Project Structure (Refactored)
+AI? Feel Free to Ask It
+The project structure is clean, the interfaces are well-documented, and the type hints are everywhere. If you paste this code into an AI assistant and say "Help me implement a custom Selector for my problem", it'll probably know what to do. I've designed it that way on purpose.
 
-```
+Project Structure (Refactored)
+text
 metathin/                    # Core framework
 ├── core/                   # Five-element interfaces (P, B, S, D, Ψ)
 │   ├── p_pattern.py       # PatternSpace interface
@@ -96,55 +91,59 @@ metathin/                    # Core framework
     └── learning.py        # 5+ learning mechanisms
 
 metathin_plus/              # Domain extensions
-├── chaos/                 # Chaos prediction
 └── sci/                   # Scientific discovery
-```
+Each file name tells you what it does – p_pattern.py = Pattern Space, b_behavior.py = Behavior, etc.
 
-**Each file name tells you what it does** – `p_pattern.py` = Pattern Space, `b_behavior.py` = Behavior, etc.
-
----
-
-## What Makes Metathin Different?
-
-### Memory Built-in, Not Bolted-on
+What Makes Metathin Different?
+Memory Built-in, Not Bolted-on
 Most frameworks treat memory as an afterthought. In Metathin, it's built into the core from day one.
 
 Every agent comes with a complete memory system:
-- **Two-tier architecture**: Fast in-memory cache + persistent backend
-- **Multiple backends**: JSON (human-readable), SQLite (production), in-memory (testing) – swap them anytime
-- **Smart management**: LRU eviction when cache fills up, TTL (time-to-live) for auto-expiring items
-- **Every component can use it**: Behaviors can remember outcomes, Selectors can recall past fitness, Learning mechanisms can store experiences
 
-*Chaos prediction needs to remember the past to forecast the future. Your agents already do, without you writing a single line of storage code.*
+Two-tier architecture: Fast in-memory cache + persistent backend
 
-### RL-ready, but not RL-only
+Multiple backends: JSON (human-readable), SQLite (production), in-memory (testing) – swap them anytime
+
+Smart management: LRU eviction when cache fills up, TTL (time-to-live) for auto-expiring items
+
+Every component can use it: Behaviors can remember outcomes, Selectors can recall past fitness, Learning mechanisms can store experiences
+
+RL-ready, but not RL-only
 The five-tuple structure maps naturally to reinforcement learning:
-- P = state representation
-- B = action space  
-- S = value function
-- D = policy
-- Ψ = update rule
+
+P = state representation
+
+B = action space
+
+S = value function
+
+D = policy
+
+Ψ = update rule
 
 But swap in a supervised Selector and a gradient-based Learner, and you're doing supervised learning. Swap in Hebbian learning with no expected output, and you're doing unsupervised learning.
 
-**Same architecture. Different components. Three paradigms.**
+Same architecture. Different components. Three paradigms.
 
-### Clean, Layered Architecture
+Clean, Layered Architecture
 The refactored codebase is organized into clear layers:
-- **Core** – Pure interfaces, no dependencies
-- **Engine** – Pure function pipeline, stateless
-- **Services** – Optional, injectable
-- **Config** – Separate from logic
-- **Agent** – Facade that assembles everything
-- **Components** – Concrete implementations
+
+Core – Pure interfaces, no dependencies
+
+Engine – Pure function pipeline, stateless
+
+Services – Optional, injectable
+
+Config – Separate from logic
+
+Agent – Facade that assembles everything
+
+Components – Concrete implementations
 
 This makes the code easy to understand, test, and extend.
 
----
-
-## Quick Start
-
-```python
+Quick Start
+python
 from metathin import Metathin, MetathinBuilder
 from metathin.components import SimplePatternSpace, FunctionBehavior, MaxFitnessStrategy
 
@@ -177,15 +176,10 @@ while True:
     
     response = agent.think(user_input, user_input=user_input)
     print(f"Agent: {response}")
-```
-
 Run it. It works.
 
----
-
-## Configuration Examples
-
-```python
+Configuration Examples
+python
 from metathin.config import MetathinConfig, MemoryConfig, ObservabilityConfig
 
 # Minimal config (no memory, no history)
@@ -199,190 +193,171 @@ config = MetathinConfig(
     memory=MemoryConfig(enabled=True, backend_type='sqlite'),
     observability=ObservabilityConfig(keep_history=True, enable_metrics=True)
 )
-```
-
----
-
-## Built-in Modules (To Get You Started)
-
-### Chaos Prediction (`metathin_plus.chaos`)
-For nonlinear time series and dynamical systems:
-- Lyapunov exponent estimation
-- Correlation dimension
-- Multiple predictors (phase space, Volterra, neural, spectral)
-- Full vs simplified versions for comparison
-
-**Why it works for time series**  
-Chaos prediction isn't just about algorithms—it's about remembering the past. Metathin's built-in memory system gives predictors access to historical states automatically, so you focus on the math, not the storage.
-
-*Perfect if you're into physics, math, or any field with complex dynamics.*
-
-### Scientific Discovery (`metathin_plus.sci`)
+Built-in Modules (To Get You Started)
+Scientific Discovery (metathin_plus.sci)
 For finding patterns and laws from data:
-- Symbolic regression engine
-- Feature extraction (30+ features)
-- Similarity matching with pre-trained function libraries
-- Adaptive extrapolation
 
-*If you work with experimental data—chemistry, biology, materials science—this might save you time.*
+Symbolic regression engine
 
----
+Feature extraction (30+ features)
 
-## The Sci Module? Also Customizable
+Similarity matching with pre-trained function libraries
 
-`metathin_plus.sci` follows the same philosophy:
+Adaptive extrapolation
 
-- Use the built-in function generator, feature extractor, and similarity matcher
-- OR implement your own discovery algorithms
-- OR extend the existing ones
+If you work with experimental data—chemistry, biology, materials science—this might save you time.
 
-The memory system (`FunctionMemoryBank`) is pluggable. The extrapolator is adaptable. Nothing is locked down.
+The Sci Module? Also Customizable
+metathin_plus.sci follows the same philosophy:
 
-**This is your framework. Use it how you want.**
+Use the built-in function generator, feature extractor, and similarity matcher
 
----
+OR implement your own discovery algorithms
 
-## This is Where You Come In
+OR extend the existing ones
 
-Metathin's core is intentionally minimal. The real power comes from **you** adding modules for your own field.
+The memory system (FunctionMemoryBank) is pluggable. The extrapolator is adaptable. Nothing is locked down.
 
-### If You're in Physics
-Add to `metathin_plus.chaos`:
-- New chaotic systems (Lorenz, Rossler, Duffing...)
-- Better prediction algorithms
-- Analysis tools (Lyapunov, dimension, entropy...)
+This is your framework. Use it how you want.
 
-### If You're in Chemistry/Biology
-Add to `metathin_plus.sci`:
-- Reaction kinetics functions
-- Population dynamics models
-- Pattern discovery examples from your own data
+This is Where You Come In
+Metathin's core is intentionally minimal. The real power comes from you adding modules for your own field.
 
-### If You're in Economics
-Create `metathin_plus.econ`:
-- Market prediction models
-- Agent-based economic simulations
-- Time series forecasting for financial data
+If You're in Physics/Chemistry/Biology
+Add to metathin_plus.sci:
 
-### If You're in Neuroscience
-Create `metathin_plus.neuro`:
-- Neural spike train analysis
-- Brain-computer interface components
-- Cognitive modeling tools
+New scientific discovery algorithms
 
-### If You're in Climate Science
-Create `metathin_plus.climate`:
-- Weather prediction models
-- Climate pattern analysis
-- Ensemble forecasting
+Domain-specific function libraries
 
-**You get the idea.** Any domain that involves data, patterns, and decision-making can build on Metathin.
+Pattern discovery examples from your own data
 
----
+If You're in Economics
+Create metathin_plus.econ:
 
-## Why Contribute?
+Market prediction models
 
-- **Your work gets used** – by researchers, students, and practitioners in your field
-- **You stand on shoulders** – the core framework handles the boring stuff, you focus on domain logic
-- **It's good for your CV** – open source contributions matter
-- **It's actually fun** – seeing your code help other people is satisfying
+Agent-based economic simulations
 
----
+Time series forecasting for financial data
 
-## How to Add Your Own Module
+If You're in Neuroscience
+Create metathin_plus.neuro:
 
-1. Fork the repo
-2. Create `metathin_plus/your_module/`
-3. Implement your components (they just need to follow the core interfaces)
-4. Add a few examples so people know how to use it
-5. Open a PR
+Neural spike train analysis
 
-**That's it.** No permission needed. If your module is useful, it gets merged. If it's experimental, we can mark it as such. The goal is to let people share.
+Brain-computer interface components
 
----
+Cognitive modeling tools
 
-## Current Status (v0.4.0)
+If You're in Climate Science
+Create metathin_plus.climate:
 
-**What works:**
-- ✅ Core five-element architecture (refactored)
-- ✅ All built-in components (30+)
-- ✅ Memory system (JSON/SQLite/in-memory backends, TTL, LRU)
-- ✅ Thinking pipeline with hooks
-- ✅ Configuration system (file/env/dict)
-- ✅ Builder pattern for easy agent creation
-- ✅ Chaos prediction module
-- ✅ Scientific discovery module
-- ✅ 492+ unit tests passing
+Weather prediction models
 
-**Under the hood, Metathin already supports:**
-- ✅ Supervised learning (via `GradientLearning` + `expected`)
-- ✅ Unsupervised learning (via `HebbianLearning`)
-- ✅ Reinforcement learning (via `RewardLearning` + exploration strategies)
-- ✅ Time series forecasting (with built-in memory for history)
+Climate pattern analysis
 
-**What's in progress:**
-- ⚠️ User manual is being written
-- ⚠️ More examples and tutorials
-- ⚠️ Performance optimizations
+Ensemble forecasting
 
-**Why not on PyPI yet?**  
+You get the idea. Any domain that involves data, patterns, and decision-making can build on Metathin.
+
+Why Contribute?
+Your work gets used – by researchers, students, and practitioners in your field
+
+You stand on shoulders – the core framework handles the boring stuff, you focus on domain logic
+
+It's good for your CV – open source contributions matter
+
+It's actually fun – seeing your code help other people is satisfying
+
+How to Add Your Own Module
+Fork the repo
+
+Create metathin_plus/your_module/
+
+Implement your components (they just need to follow the core interfaces)
+
+Add a few examples so people know how to use it
+
+Open a PR
+
+That's it. No permission needed. If your module is useful, it gets merged. If it's experimental, we can mark it as such. The goal is to let people share.
+
+Current Status (v0.4.0)
+What works:
+
+✅ Core five-element architecture (refactored)
+
+✅ All built-in components (30+)
+
+✅ Memory system (JSON/SQLite/in-memory backends, TTL, LRU)
+
+✅ Thinking pipeline with hooks
+
+✅ Configuration system (file/env/dict)
+
+✅ Builder pattern for easy agent creation
+
+✅ Scientific discovery module
+
+✅ 492+ unit tests passing
+
+Under the hood, Metathin already supports:
+
+✅ Supervised learning (via GradientLearning + expected)
+
+✅ Unsupervised learning (via HebbianLearning)
+
+✅ Reinforcement learning (via RewardLearning + exploration strategies)
+
+✅ Time series forecasting (with built-in memory for history)
+
+What's in progress:
+
+⚠️ User manual is being written
+
+⚠️ More examples and tutorials
+
+⚠️ Performance optimizations
+
+Why not on PyPI yet?
 I want to get more feedback first, make sure the API feels right. Once stable, it'll be there.
 
----
-
-## Installation
-
-```bash
+Installation
+bash
 # Core only
 pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git
-
-# With chaos module
-pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[chaos]
 
 # With scientific discovery
 pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[sci]
 
 # Everything
 pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[full]
-```
-
 Dependencies are grouped, so you only install what you need.
 
----
+How to Contribute (Even Without Code)
+Star the repo – lets me know someone cares
 
-## How to Contribute (Even Without Code)
+Open an issue – found a bug? have an idea?
 
-- **Star the repo** – lets me know someone cares
-- **Open an issue** – found a bug? have an idea?
-- **Improve docs** – fix typos, add explanations
-- **Write examples** – show how you use it in your field
-- **Tell people** – share it with your lab, your students, your Twitter followers
+Improve docs – fix typos, add explanations
 
----
+Write examples – show how you use it in your field
 
-## The Vision
+Tell people – share it with your lab, your students, your Twitter followers
 
-A growing collection of domain-specific modules, all built on the same core framework. A physicist's chaos tools, a chemist's reaction kinetics, an economist's market models—all accessible through the same clean API.
+The Vision
+A growing collection of domain-specific modules, all built on the same core framework. A physicist's tools, a chemist's reaction kinetics, an economist's market models—all accessible through the same clean API.
 
-**Is that ambitious?** Yes.  
-**Can we build it together?** Also yes.
+Is that ambitious? Yes.
+Can we build it together? Also yes.
 
----
-
-## License
-
+License
 MIT – do what you want, just don't blame me if it breaks.
 
----
-
-## Acknowledgements
-
+Acknowledgements
 Started from my own experimental data needs. If you find it useful, great. If you want to build it together, even better.
 
----
+If you like it, star it. If you want to help, PR it. If you have ideas, issue it. If you want to add your own module, just do it.
 
-**If you like it, star it. If you want to help, PR it. If you have ideas, issue it. If you want to add your own module, just do it.**
-
----
-
-*Questions? Suggestions? Find me at [1799824258@qq.com](mailto:1799824258@qq.com)*
+Questions? Suggestions? Find me at 1799824258@qq.com
