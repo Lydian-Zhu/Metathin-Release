@@ -1,25 +1,20 @@
-# metathin_plus/chaos/metachaos.py
+# metathin_plus/chaos/metachaos.py - 完整修复版
+
 """
-MetaChaos - Main Agent for Chaos Prediction
-============================================
-
-Main agent that assembles all five components (P, B, S, D, Ψ)
-for chaos time series prediction.
-
-MetaChaos - 混沌预测主智能体
-组装所有五个 Metathin 组件用于混沌时间序列预测。
+MetaChaos - Main Agent for Chaos Prediction with Training Phase
+================================================================
 """
 
 import numpy as np
-from typing import Any, Dict, List, Optional, Union, Type
+from typing import Any, Dict, List, Optional, Tuple
 import time
 import logging
+from dataclasses import dataclass, field
+from collections import defaultdict, Counter
 
-from metathin import Metathin, MetathinBuilder
 from metathin.core.types import FeatureVector
-from metathin.core.exceptions import NoBehaviorError
 
-from .base import SystemState, PredictionResult, ChaosModel, T
+from .base import SystemState, PredictionResult
 from .pattern_space import ChaosPatternSpace
 from .behaviors import (
     BaseChaosBehavior,
@@ -31,98 +26,56 @@ from .behaviors import (
     SpectralBehavior,
 )
 from .selector import ChaosSelector
-from .decision import MinErrorStrategy, WeightedVoteStrategy, AdaptiveStrategy
-from .learning import ErrorLearning, RewardLearning
+from .decision import MinErrorStrategy, AdaptiveStrategy
 
 
-# Behavior registry | 行为注册表
-BEHAVIOR_REGISTRY = {
-    'persistent': PersistentBehavior,
-    'linear_trend': LinearTrendBehavior,
-    'phase_space': PhaseSpaceBehavior,
-    'volterra': VolterraBehavior,
-    'neural': NeuralBehavior,
-    'spectral': SpectralBehavior,
-}
+@dataclass
+class TrainingSample:
+    """训练样本"""
+    features: np.ndarray
+    behavior_name: str
+    prediction: float
+    actual: float
+    error: float
+    timestamp: float
 
 
 class MetaChaos:
     """
-    MetaChaos - Main chaos prediction agent.
-    MetaChaos - 混沌预测主智能体。
-    
-    Assembles all five Metathin components for chaos prediction.
-    组装所有五个 Metathin 组件用于混沌预测。
-    
-    Components | 组件:
-        - P (PatternSpace): ChaosPatternSpace | 混沌模式空间
-        - B (Behaviors): List of prediction behaviors | 预测行为列表
-        - S (Selector): ChaosSelector | 混沌选择器
-        - D (Decision): Decision strategy | 决策策略
-        - Ψ (Learning): Learning mechanism | 学习机制
-    
-    Example | 示例:
-        >>> agent = MetaChaos()
-        >>> 
-        >>> # Online prediction | 在线预测
-        >>> for value in data_stream:
-        ...     prediction = agent.predict(value)
-        ...     agent.update(value)  # Update with actual value
-        ...     print(f"Predicted: {prediction.value:.4f}")
+    MetaChaos - Main chaos prediction agent with training phase.
     """
+    
+    BEHAVIOR_REGISTRY = {
+        'persistent': PersistentBehavior,
+        'linear_trend': LinearTrendBehavior,
+        'phase_space': PhaseSpaceBehavior,
+        'volterra': VolterraBehavior,
+        'neural': NeuralBehavior,
+        'spectral': SpectralBehavior,
+    }
     
     def __init__(
         self,
         name: str = "MetaChaos",
-        window_size: int = 10,
+        window_size: int = 15,
         include_velocity: bool = True,
         include_acceleration: bool = True,
         include_stats: bool = True,
         behaviors: Optional[List[str]] = None,
-        decision_strategy: str = "min_error",
-        decision_params: Optional[Dict[str, Any]] = None,
-        selector_error_window: int = 10,  # 保留兼容，但新选择器不再使用
-        enable_learning: bool = True,
-        learning_type: str = "error",
-        learning_rate: float = 0.1,
-        error_threshold: float = 0.5,
-        memory_size: int = 1000,
+        feature_dim: Optional[int] = None,
+        learning_rate: float = 0.01,
+        temperature: float = 1.0,
         verbose: bool = False,
     ):
-        """
-        Initialize MetaChaos agent.
-        初始化 MetaChaos 智能体。
-        
-        Args:
-            name: Agent name | 智能体名称
-            window_size: Feature extraction window | 特征提取窗口
-            include_velocity: Include velocity in features | 特征中包含速度
-            include_acceleration: Include acceleration in features | 特征中包含加速度
-            include_stats: Include statistical features | 包含统计特征
-            behaviors: List of behavior names to use (None = all) | 使用的行为列表
-            decision_strategy: Strategy type: 'min_error', 'weighted_vote', 'adaptive'
-                               决策策略类型
-            decision_params: Additional parameters for decision strategy | 决策策略参数
-            selector_error_window: Error window for selector | 选择器误差窗口
-            enable_learning: Enable learning mechanism | 启用学习机制
-            learning_type: Learning type: 'error', 'reward' | 学习类型
-            learning_rate: Learning rate | 学习率
-            error_threshold: Error threshold for learning | 学习误差阈值
-            memory_size: History memory size | 历史记忆大小
-            verbose: Enable verbose logging | 启用详细日志
-        """
         self.name = name
         self.verbose = verbose
-        self.enable_learning = enable_learning
+        self.learning_rate = learning_rate
         
-        # Setup logging | 设置日志
         self._logger = logging.getLogger(f"metathin_plus.chaos.{name}")
         if verbose:
             self._logger.setLevel(logging.DEBUG)
         
-        # ============================================================
-        # 1. Pattern Space (P) | 感知层
-        # ============================================================
+        # Pattern Space (P)
         self.pattern_space = ChaosPatternSpace(
             window_size=window_size,
             include_velocity=include_velocity,
@@ -131,87 +84,69 @@ class MetaChaos:
             name=f"{name}_pattern"
         )
         
-        # 获取特征维度
-        self.feature_dim = self.pattern_space.get_feature_dimension()
+        # Determine feature dimension
+        if feature_dim is None:
+            sample_state = SystemState(data=0.0, timestamp=0)
+            sample_features = self.pattern_space.extract(sample_state)
+            self.feature_dim = len(sample_features)
+        else:
+            self.feature_dim = feature_dim
         
-        # ============================================================
-        # 2. Behaviors (B) | 行动层
-        # ============================================================
+        # Behaviors (B)
         self.behaviors: List[BaseChaosBehavior] = []
         self._behavior_dict: Dict[str, BaseChaosBehavior] = {}
-        self._init_behaviors(behaviors, memory_size)
+        self._init_behaviors(behaviors)
         
-        # ============================================================
-        # 3. Selector (S) | 评估层 - 使用新的基于特征的选择器
-        # ============================================================
-        from .selector import ChaosSelector
+        # Selector (S)
         self.selector = ChaosSelector(
             n_features=self.feature_dim,
-            n_behaviors=len(self.behaviors) if self.behaviors else None,
+            n_behaviors=len(self.behaviors),
             learning_rate=learning_rate,
-            temperature=1.0,
+            temperature=temperature,
             use_history=True,
             history_weight=0.3
         )
         
-        # ============================================================
-        # 4. Decision Strategy (D) | 决策层
-        # ============================================================
-        self.decision_strategy = self._create_decision_strategy(
-            decision_strategy, decision_params
-        )
+        # Decision Strategy (D)
+        self.decision_strategy = AdaptiveStrategy(epsilon=0.1, decay=0.99, min_epsilon=0.01)
         
+        # Training state
+        self._is_trained = False
+        self._training_samples: List[TrainingSample] = []
         
-        # ============================================================
-        # 5. Learning Mechanism (Ψ) | 学习层
-        # ============================================================
-        self.learning_mechanism = self._create_learning_mechanism(
-            learning_type, learning_rate, error_threshold
-        ) if enable_learning else None
-        
-        # ============================================================
-        # State Management | 状态管理
-        # ============================================================
+        # Runtime state
         self._history: List[float] = []
         self._timestamps: List[float] = []
         self._predictions: List[PredictionResult] = []
-        self._selected_behavior_history: List[str] = []
+        self._selected_history: List[str] = []
+        self._error_history: List[float] = []
         
-        # Statistics | 统计信息
+        # Statistics
         self._total_predictions = 0
-        self._restart_count = 0
+        self._train_steps = 0
+        self._exploration_count = 0
+        self._exploitation_count = 0
         self._start_time = time.time()
         
-        self._logger.info(f"MetaChaos '{name}' initialized")
-        self._logger.info(f"  Behaviors: {[b.name for b in self.behaviors]}")
-        self._logger.info(f"  Decision: {decision_strategy}")
-        self._logger.info(f"  Learning: {learning_type if enable_learning else 'disabled'}")
+        self._logger.info(f"MetaChaos '{name}' initialized with {len(self.behaviors)} behaviors")
+        self._logger.info(f"  Feature dimension: {self.feature_dim}")
     
-    def _init_behaviors(self, behavior_names: Optional[List[str]], memory_size: int):
-        """
-        Initialize prediction behaviors.
-        初始化预测行为。
-        
-        Args:
-            behavior_names: List of behavior names, None for all | 行为名称列表
-            memory_size: Memory size for each behavior | 每个行为的内存大小
-        """
+    def _init_behaviors(self, behavior_names: Optional[List[str]]):
+        """初始化行为"""
         if behavior_names is None:
-            # Use all behaviors | 使用所有行为
-            behavior_names = list(BEHAVIOR_REGISTRY.keys())
+            behavior_names = list(self.BEHAVIOR_REGISTRY.keys())
         
         for name in behavior_names:
-            if name not in BEHAVIOR_REGISTRY:
+            if name not in self.BEHAVIOR_REGISTRY:
                 self._logger.warning(f"Unknown behavior: {name}, skipping")
                 continue
             
-            behavior_class = BEHAVIOR_REGISTRY[name]
+            behavior_class = self.BEHAVIOR_REGISTRY[name]
             
-            # Create behavior with appropriate parameters | 使用适当参数创建行为
             if name == 'phase_space':
                 behavior = behavior_class(
                     embed_dim=5, delay=3, k_neighbors=5,
-                    min_history=100, name=f"{self.name}_{name}"
+                    min_history=50, name=f"{self.name}_{name}"
                 )
             elif name == 'volterra':
                 behavior = behavior_class(
@@ -230,458 +165,287 @@ class MetaChaos:
                 )
             elif name == 'linear_trend':
                 behavior = behavior_class(window=5, name=f"{self.name}_{name}")
-            else:  # persistent
+            else:
                 behavior = behavior_class(name=f"{self.name}_{name}")
             
             self.behaviors.append(behavior)
             self._behavior_dict[behavior.name] = behavior
     
-    def _create_decision_strategy(self, strategy: str, params: Optional[Dict]) -> Any:
-        """
-        Create decision strategy.
-        创建决策策略。
+    # ============================================================
+    # 训练阶段
+    # ============================================================
+    
+    def train(
+        self,
+        data: np.ndarray,
+        timestamps: Optional[np.ndarray] = None,
+        train_steps: Optional[int] = None,
+        exploration_rate: float = 0.3,
+        exploration_decay: float = 0.99,
+        min_exploration: float = 0.05,
+        batch_size: int = 50,
+        verbose: bool = True
+    ) -> Dict[str, Any]:
+        """训练智能体"""
+        if timestamps is None:
+            timestamps = np.arange(len(data))
         
-        Args:
-            strategy: Strategy name | 策略名称
-            params: Additional parameters | 额外参数
+        if train_steps is None:
+            train_steps = len(data)
+        
+        train_steps = min(train_steps, len(data))
+        train_data = data[:train_steps]
+        train_times = timestamps[:train_steps]
+        
+        self._logger.info(f"\n{'='*60}")
+        self._logger.info(f"TRAINING PHASE | 训练阶段")
+        self._logger.info(f"  Steps: {train_steps}")
+        self._logger.info(f"  Initial exploration rate: {exploration_rate}")
+        self._logger.info(f"{'='*60}")
+        
+        current_epsilon = exploration_rate
+        self._training_samples.clear()
+        
+        behavior_errors = {b.name: [] for b in self.behaviors}
+        behavior_counts = {b.name: 0 for b in self.behaviors}
+        
+        for step in range(train_steps):
+            value = train_data[step]
+            t = train_times[step]
             
-        Returns:
-            DecisionStrategy: Decision strategy instance | 决策策略实例
-        """
-        params = params or {}
+            self._history.append(value)
+            self._timestamps.append(t)
+            
+            if step == 0:
+                continue
+            
+            state = SystemState(data=value, timestamp=t, metadata={'step': step, 'phase': 'train'})
+            features = self.pattern_space.extract(state)
+            
+            # 探索 vs 利用
+            if np.random.random() < current_epsilon:
+                behavior = np.random.choice(self.behaviors)
+                self._exploration_count += 1
+            else:
+                fitness_scores = [self.selector.compute_fitness(b, features) for b in self.behaviors]
+                best_idx = np.argmax(fitness_scores)
+                behavior = self.behaviors[best_idx]
+                self._exploitation_count += 1
+            
+            behavior_counts[behavior.name] += 1
+            
+            # 用上一个值预测当前值
+            prev_value = train_data[step - 1]
+            pred_result = behavior.execute(features, current_value=prev_value, state=state)
+            
+            if isinstance(pred_result, PredictionResult):
+                pred_value = pred_result.value
+            else:
+                pred_value = pred_result
+            
+            error = abs(pred_value - value)
+            behavior_errors[behavior.name].append(error)
+            
+            self._training_samples.append(TrainingSample(
+                features=features.copy(),
+                behavior_name=behavior.name,
+                prediction=pred_value,
+                actual=value,
+                error=error,
+                timestamp=t
+            ))
+            
+            # 批量更新权重
+            if step % batch_size == 0 and step > 0:
+                self._update_selector_weights(behavior_errors)
+            
+            current_epsilon = max(min_exploration, current_epsilon * exploration_decay)
+            
+            if verbose and (step + 1) % (max(1, train_steps // 10)) == 0:
+                recent_errors = [e for errs in behavior_errors.values() for e in errs[-100:]]
+                avg_error = np.mean(recent_errors) if recent_errors else 1.0
+                self._logger.info(f"  Step {step+1}/{train_steps}: ε={current_epsilon:.3f}, avg_error={avg_error:.4f}")
         
-        if strategy == 'min_error':
-            return MinErrorStrategy(error_window=params.get('error_window', 10))
+        # 最终更新权重
+        self._update_selector_weights(behavior_errors, final=True)
         
-        elif strategy == 'weighted_vote':
-            return WeightedVoteStrategy(temperature=params.get('temperature', 1.0))
+        # 分析结果
+        training_stats = self._analyze_training_results(behavior_counts, behavior_errors)
         
-        elif strategy == 'adaptive':
-            return AdaptiveStrategy(
-                epsilon=params.get('epsilon', 0.1),
-                decay=params.get('decay', 0.99),
-                min_epsilon=params.get('min_epsilon', 0.01),
-                weighted_threshold=params.get('weighted_threshold', 0.7)
-            )
+        self._is_trained = True
+        self._train_steps = train_steps
         
+        self._print_training_summary(training_stats)
+        
+        return training_stats
+    
+    def _update_selector_weights(self, behavior_errors: Dict[str, List[float]], final: bool = False):
+        """更新选择器权重"""
+        avg_errors = {}
+        for name, errors in behavior_errors.items():
+            if errors:
+                avg_errors[name] = np.mean(errors[-100:])
+            else:
+                avg_errors[name] = 0.5
+        
+        best_behavior = min(avg_errors, key=avg_errors.get)
+        
+        if final:
+            samples = self._training_samples
         else:
-            self._logger.warning(f"Unknown strategy: {strategy}, using min_error")
-            return MinErrorStrategy()
-    
-    def _create_learning_mechanism(self, learning_type: str, lr: float, threshold: float) -> Any:
-        """
-        Create learning mechanism.
-        创建学习机制。
+            samples = self._training_samples[-100:]
         
-        Args:
-            learning_type: Learning type | 学习类型
-            lr: Learning rate | 学习率
-            threshold: Error threshold | 误差阈值
+        for sample in samples:
+            behavior_idx = self.selector._behavior_indices.get(sample.behavior_name)
+            if behavior_idx is None:
+                continue
             
-        Returns:
-            LearningMechanism: Learning mechanism instance | 学习机制实例
-        """
-        if learning_type == 'error':
-            return ErrorLearning(learning_rate=lr, error_threshold=threshold)
-        elif learning_type == 'reward':
-            return RewardLearning(learning_rate=lr, baseline=threshold)
-        else:
-            self._logger.warning(f"Unknown learning type: {learning_type}, using error")
-            return ErrorLearning(learning_rate=lr, error_threshold=threshold)
+            target_fitness = 1.0 if sample.behavior_name == best_behavior else 0.0
+            
+            z = np.dot(self.selector.weights[behavior_idx], sample.features) + self.selector.bias[behavior_idx]
+            current_fitness = 1.0 / (1.0 + np.exp(-z / self.selector.temperature))
+            
+            error = target_fitness - current_fitness
+            grad = current_fitness * (1 - current_fitness) * error / self.selector.temperature
+            
+            for j in range(self.feature_dim):
+                self.selector.weights[behavior_idx, j] += self.learning_rate * grad * sample.features[j]
+            self.selector.bias[behavior_idx] += self.learning_rate * grad
     
-    def _extract_features(self, state: SystemState) -> FeatureVector:
-        """
-        Extract features using pattern space.
-        使用模式空间提取特征。
-        
-        Args:
-            state: System state | 系统状态
-            
-        Returns:
-            FeatureVector: Feature vector | 特征向量
-        """
-        return self.pattern_space.extract(state)
-    
-    def _select_behavior(self, features: FeatureVector) -> BaseChaosBehavior:
-        """
-        Select best behavior using decision strategy.
-        使用决策策略选择最佳行为。
-        
-        Args:
-            features: Feature vector | 特征向量
-            
-        Returns:
-            BaseChaosBehavior: Selected behavior | 选中的行为
-        """
-        # Compute fitness for each behavior | 计算每个行为的适应度
-        fitness_scores = []
+    def _analyze_training_results(self, behavior_counts: Dict[str, int], 
+                                   behavior_errors: Dict[str, List[float]]) -> Dict[str, Any]:
+        """分析训练结果"""
+        behavior_stats = {}
         for behavior in self.behaviors:
-            fitness = self.selector.compute_fitness(behavior, features)
-            fitness_scores.append(fitness)
+            name = behavior.name
+            count = behavior_counts.get(name, 0)
+            errors = behavior_errors.get(name, [])
+            
+            behavior_stats[name] = {
+                'usage_count': count,
+                'usage_percentage': count / self._train_steps * 100 if self._train_steps > 0 else 0,
+                'mean_error': np.mean(errors) if errors else 1.0,
+                'std_error': np.std(errors) if errors else 0,
+                'min_error': np.min(errors) if errors else 1.0,
+                'max_error': np.max(errors) if errors else 1.0,
+            }
         
-        # Select using decision strategy | 使用决策策略选择
-        selected = self.decision_strategy.select(
-            self.behaviors, fitness_scores, features
-        )
+        best_behavior = min(behavior_stats.items(), key=lambda x: x[1]['mean_error'])
         
-        return selected
-    
-    def _apply_learning(self, behavior: BaseChaosBehavior, prediction: PredictionResult, actual: float):
-        """
-        Apply learning based on prediction error.
-        基于预测误差应用学习。
-        
-        Args:
-            behavior: The behavior that made the prediction | 做出预测的行为
-            prediction: Prediction result | 预测结果
-            actual: Actual value | 实际值
-        """
-        if self.learning_mechanism is None:
-            return
-        
-        # Compute adjustment | 计算调整量
-        context = {
-            'behavior_name': behavior.name,
-            'features': None,  # Can be added if needed | 需要时可添加
-            'parameters': self.selector.get_parameters(),
+        return {
+            'total_steps': self._train_steps,
+            'exploration_count': self._exploration_count,
+            'exploitation_count': self._exploitation_count,
+            'exploration_rate': self._exploration_count / self._train_steps if self._train_steps > 0 else 0,
+            'behavior_stats': behavior_stats,
+            'best_behavior': best_behavior[0],
+            'best_behavior_error': best_behavior[1]['mean_error'],
         }
+    
+    def _print_training_summary(self, stats: Dict[str, Any]):
+        """打印训练总结"""
+        self._logger.info(f"\n{'='*60}")
+        self._logger.info(f"TRAINING SUMMARY | 训练总结")
+        self._logger.info(f"{'='*60}")
         
-        adjustment = self.learning_mechanism.compute_adjustment(
-            prediction.value, actual, context
-        )
+        self._logger.info(f"\nOverall Statistics:")
+        self._logger.info(f"  Total steps: {stats['total_steps']}")
+        self._logger.info(f"  Exploration rate: {stats['exploration_rate']:.1%}")
+        self._logger.info(f"  Best behavior: {stats['best_behavior']} (error={stats['best_behavior_error']:.6f})")
         
-        # Apply adjustment to selector | 将调整应用于选择器
-        if adjustment:
-            self.selector.update_parameters(adjustment)
+        self._logger.info(f"\nBehavior Performance:")
+        self._logger.info(f"  {'Behavior':<40} {'Usage':>8} {'Mean Error':>12}")
+        self._logger.info(f"  {'-'*60}")
+        
+        behavior_stats = stats['behavior_stats']
+        for name, bstats in sorted(behavior_stats.items(), key=lambda x: x[1]['mean_error']):
+            short_name = name.replace(f"{self.name}_", "")[:35]
+            self._logger.info(f"  {short_name:<40} {bstats['usage_count']:>8} {bstats['mean_error']:>12.6f}")
+        
+        self._logger.info(f"\n✅ Training complete!")
+    
+    # ============================================================
+    # 预测阶段
+    # ============================================================
     
     def predict(self, value: float, timestamp: Optional[float] = None) -> PredictionResult:
-        """
-        Make a prediction for the next value.
-        预测下一个值。
+        """预测下一个值"""
+        if timestamp is None:
+            timestamp = time.time()
         
-        Args:
-            value: Current observed value | 当前观测值
-            timestamp: Optional timestamp | 可选时间戳
-            
-        Returns:
-            PredictionResult: Prediction result | 预测结果
-        """
-        # Create state | 创建状态
-        state = SystemState(
-            data=value,
-            timestamp=timestamp or time.time(),
-            metadata={'start_time': self._start_time}
-        )
-        
-        # Update history | 更新历史
         self._history.append(value)
-        if timestamp is not None:
-            self._timestamps.append(timestamp)
+        self._timestamps.append(timestamp)
         
-        # Extract features | 提取特征
-        features = self._extract_features(state)
+        state = SystemState(data=value, timestamp=timestamp, 
+                           metadata={'step': len(self._history), 'phase': 'prediction'})
+        features = self.pattern_space.extract(state)
         
-        # Select behavior | 选择行为
-        selected_behavior = self._select_behavior(features)
-        self._selected_behavior_history.append(selected_behavior.name)
+        fitness_scores = [self.selector.compute_fitness(b, features) for b in self.behaviors]
+        best_idx = np.argmax(fitness_scores)
+        selected_behavior = self.behaviors[best_idx]
+        self._selected_history.append(selected_behavior.name)
         
-        # Make prediction | 进行预测
-        # Pass current value to behavior for better baseline | 传递当前值给行为以获得更好的基线
-        prediction_value = selected_behavior.execute(
-            features,
-            current_value=value,
-            state=state
-        )
+        pred_result = selected_behavior.execute(features, current_value=value, state=state)
         
-        # Handle different return types | 处理不同的返回类型
-        if isinstance(prediction_value, PredictionResult):
-            result = prediction_value
+        if isinstance(pred_result, PredictionResult):
+            result = pred_result
+            if result.method == "unknown":
+                result.method = selected_behavior.name
         else:
-            # If behavior returns raw value | 如果行为返回原始值
             result = PredictionResult(
-                value=float(prediction_value),
-                confidence=0.5,
+                value=float(pred_result),
+                confidence=fitness_scores[best_idx],
                 method=selected_behavior.name
             )
         
         self._predictions.append(result)
         self._total_predictions += 1
         
-        # Record for selector | 记录给选择器
-        self.selector.record_fitness(selected_behavior.name, result.confidence)
-        
-        if self.verbose:
-            self._logger.debug(f"Prediction: {result.value:.4f} (method={result.method})")
-        
         return result
     
-    def update(self, actual_value: float, behavior_name: Optional[str] = None) -> float:
-        """
-        Update agent with actual observed value.
-        用实际观测值更新智能体。
-        
-        Args:
-            actual_value: Actual observed value | 实际观测值
-            behavior_name: Specific behavior to update (None = last used)
-                           要更新的特定行为（None = 最后使用的）
-            
-        Returns:
-            float: Prediction error | 预测误差
-        """
-        # Get last prediction | 获取最后一次预测
+    def update(self, actual_value: float) -> float:
+        """用实际值更新智能体"""
         if not self._predictions:
             return 0.0
         
         last_prediction = self._predictions[-1]
+        error = abs(last_prediction.value - actual_value)
+        self._error_history.append(error)
         
-        # Determine which behavior made the prediction | 确定哪个行为做出了预测
-        if behavior_name is None:
-            behavior_name = last_prediction.method
+        behavior_name = last_prediction.method
+        self.selector.record_prediction_error(behavior_name, error)
         
         behavior = self._behavior_dict.get(behavior_name)
-        if behavior is None:
-            self._logger.warning(f"Behavior {behavior_name} not found")
-            return 0.0
-        
-        # Update behavior with actual value | 用实际值更新行为
-        error = behavior.update_actual(actual_value)
-        
-        # Update selector | 更新选择器
-        self.selector.record_prediction(behavior_name, last_prediction, actual_value)
-        
-        # Apply learning | 应用学习
-        if self.enable_learning:
-            self._apply_learning(behavior, last_prediction, actual_value)
-        
-        # Update last prediction with error | 用误差更新最后一次预测
-        last_prediction.error = error
-        self._predictions[-1] = last_prediction
-        
-        # Check for restart condition | 检查重启条件
-        if error > 1.0:  # Large error threshold | 大误差阈值
-            self._restart_count += 1
-            self._logger.info(f"Large error {error:.4f}, restarting...")
-            self.reset()
+        if behavior:
+            behavior.update_actual(actual_value)
         
         return error
     
-    def reset(self) -> None:
-        """Reset agent state | 重置智能体状态"""
-        self.pattern_space.reset()
-        
-        for behavior in self.behaviors:
-            behavior.reset()
-        
-        self.selector.reset()
+    def reset(self):
+        """重置运行时状态（保留训练好的权重）"""
         self._history.clear()
         self._timestamps.clear()
         self._predictions.clear()
-        self._selected_behavior_history.clear()
+        self._selected_history.clear()
+        self._error_history.clear()
         self._total_predictions = 0
-        self._start_time = time.time()
-        
-        self._logger.info("MetaChaos reset")
     
     def get_statistics(self) -> Dict[str, Any]:
-        """
-        Get agent statistics.
-        获取智能体统计信息。
-        
-        Returns:
-            Dict: Statistics dictionary | 统计字典
-        """
-        # Calculate recent error | 计算近期误差
-        recent_errors = []
-        for pred in self._predictions[-100:]:
-            if pred.error is not None:
-                recent_errors.append(pred.error)
-        
-        # Get behavior stats | 获取行为统计
-        behavior_stats = {}
-        for behavior in self.behaviors:
-            behavior_stats[behavior.name] = behavior.get_stats()
+        """获取统计信息"""
+        runtime = time.time() - self._start_time
+        behavior_usage = Counter(self._selected_history)
+        recent_errors = self._error_history[-100:] if self._error_history else []
         
         return {
             'name': self.name,
+            'is_trained': self._is_trained,
+            'train_steps': self._train_steps,
             'total_predictions': self._total_predictions,
-            'restart_count': self._restart_count,
-            'uptime': time.time() - self._start_time,
-            'recent_error': float(np.mean(recent_errors)) if recent_errors else None,
-            'last_error': self._predictions[-1].error if self._predictions else None,
-            'selected_behavior': self._selected_behavior_history[-1] if self._selected_behavior_history else None,
-            'behavior_usage': self._get_behavior_usage(),
-            'behavior_stats': behavior_stats,
-            'selector_stats': {
-                'n_behaviors': len(self.behaviors),
-                'error_window': self.selector.error_window,
-            },
-            'learning_enabled': self.enable_learning,
+            'runtime': runtime,
+            'exploration_count': self._exploration_count,
+            'exploitation_count': self._exploitation_count,
+            'behavior_usage': dict(behavior_usage),
+            'recent_mean_error': np.mean(recent_errors) if recent_errors else None,
+            'feature_dim': self.feature_dim,
+            'n_behaviors': len(self.behaviors),
         }
-    
-    def _get_behavior_usage(self) -> Dict[str, int]:
-        """Get behavior usage counts | 获取行为使用次数"""
-        usage = {}
-        for name in self._selected_behavior_history:
-            usage[name] = usage.get(name, 0) + 1
-        return usage
-    
-    def get_behavior(self, name: str) -> Optional[BaseChaosBehavior]:
-        """Get behavior by name | 根据名称获取行为"""
-        return self._behavior_dict.get(name)
-    
-    def add_behavior(self, behavior: BaseChaosBehavior) -> None:
-        """
-        Add a custom behavior.
-        添加自定义行为。
-        
-        Args:
-            behavior: Behavior instance | 行为实例
-        """
-        self.behaviors.append(behavior)
-        self._behavior_dict[behavior.name] = behavior
-        self._logger.info(f"Added behavior: {behavior.name}")
-    
-    def remove_behavior(self, name: str) -> bool:
-        """
-        Remove a behavior.
-        移除行为。
-        
-        Args:
-            name: Behavior name | 行为名称
-            
-        Returns:
-            bool: Success status | 成功状态
-        """
-        if name in self._behavior_dict:
-            behavior = self._behavior_dict[name]
-            self.behaviors.remove(behavior)
-            del self._behavior_dict[name]
-            self._logger.info(f"Removed behavior: {name}")
-            return True
-        return False
-    
-    def set_decision_strategy(self, strategy: str, **params) -> None:
-        """
-        Change decision strategy at runtime.
-        在运行时更改决策策略。
-        
-        Args:
-            strategy: Strategy name | 策略名称
-            **params: Strategy parameters | 策略参数
-        """
-        self.decision_strategy = self._create_decision_strategy(strategy, params)
-        self._logger.info(f"Decision strategy changed to: {strategy}")
-    
-    def set_learning_rate(self, learning_rate: float) -> None:
-        """Set learning rate | 设置学习率"""
-        if self.learning_mechanism:
-            if hasattr(self.learning_mechanism, 'learning_rate'):
-                self.learning_mechanism.learning_rate = learning_rate
-            self._logger.debug(f"Learning rate set to {learning_rate}")
-    
-    def __call__(self, value: float, **kwargs) -> PredictionResult:
-        """Make the agent callable | 使智能体可调用"""
-        return self.predict(value, **kwargs)
-    
-    def __repr__(self) -> str:
-        return (f"MetaChaos(name='{self.name}', "
-                f"predictions={self._total_predictions}, "
-                f"behaviors={len(self.behaviors)})")
-
-
-# ============================================================
-# Convenience Functions | 便捷函数
-# ============================================================
-
-def create_default_chaos_agent(
-    name: str = "DefaultChaos",
-    include_neural: bool = True,
-    verbose: bool = False
-) -> MetaChaos:
-    """
-    Create a chaos agent with default configuration.
-    创建具有默认配置的混沌智能体。
-    
-    Args:
-        name: Agent name | 智能体名称
-        include_neural: Include neural network behavior | 包含神经网络行为
-        verbose: Enable verbose logging | 启用详细日志
-        
-    Returns:
-        MetaChaos: Configured agent | 配置好的智能体
-    """
-    behaviors = ['persistent', 'linear_trend', 'phase_space', 'volterra', 'spectral']
-    if include_neural:
-        behaviors.append('neural')
-    
-    return MetaChaos(
-        name=name,
-        window_size=10,
-        include_velocity=True,
-        include_acceleration=True,
-        include_stats=True,
-        behaviors=behaviors,
-        decision_strategy='adaptive',
-        decision_params={'epsilon': 0.1, 'decay': 0.99},
-        selector_error_window=10,
-        enable_learning=True,
-        learning_type='error',
-        learning_rate=0.1,
-        error_threshold=0.5,
-        verbose=verbose
-    )
-
-
-def create_minimal_chaos_agent(name: str = "MinimalChaos") -> MetaChaos:
-    """
-    Create a minimal chaos agent (fast, fewer behaviors).
-    创建最小混沌智能体（快速，更少行为）。
-    
-    Args:
-        name: Agent name | 智能体名称
-        
-    Returns:
-        MetaChaos: Minimal agent | 最小智能体
-    """
-    return MetaChaos(
-        name=name,
-        window_size=5,
-        include_velocity=True,
-        include_acceleration=False,
-        include_stats=False,
-        behaviors=['persistent', 'linear_trend'],
-        decision_strategy='min_error',
-        enable_learning=False,
-        verbose=False
-    )
-
-
-def create_full_chaos_agent(name: str = "FullChaos", verbose: bool = False) -> MetaChaos:
-    """
-    Create a full-featured chaos agent (all behaviors, adaptive).
-    创建全功能混沌智能体（所有行为，自适应）。
-    
-    Args:
-        name: Agent name | 智能体名称
-        verbose: Enable verbose logging | 启用详细日志
-        
-    Returns:
-        MetaChaos: Full-featured agent | 全功能智能体
-    """
-    return MetaChaos(
-        name=name,
-        window_size=15,
-        include_velocity=True,
-        include_acceleration=True,
-        include_stats=True,
-        behaviors=['persistent', 'linear_trend', 'phase_space', 'volterra', 'neural', 'spectral'],
-        decision_strategy='adaptive',
-        decision_params={'epsilon': 0.1, 'decay': 0.995, 'min_epsilon': 0.01},
-        selector_error_window=20,
-        enable_learning=True,
-        learning_type='reward',
-        learning_rate=0.05,
-        error_threshold=0.3,
-        memory_size=2000,
-        verbose=verbose
-    )

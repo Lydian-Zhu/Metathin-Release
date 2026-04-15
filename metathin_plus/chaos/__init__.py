@@ -1,34 +1,19 @@
-# metathin_plus/chaos/__init__.py - 修复导入顺序
-
 """
 Metathin+ Chaos Module - Adapted to Metathin Quintuple Interface
 ================================================================
-
-Chaos prediction module refactored to use Metathin core interfaces (P, B, S, D, Ψ).
-
-Version: 0.5.0 (Refactored)
 """
 
 __version__ = '0.5.0'
 __author__ = 'Lydian-Zhu'
 __license__ = 'MIT'
 
-# ============================================================
-# 1. Base types (no dependencies) | 基础类型（无依赖）
-# ============================================================
-
+# Base types
 from .base import SystemState, PredictionResult, ChaosModel
 
-# ============================================================
-# 2. Pattern Space (P) | 感知层
-# ============================================================
-
+# P - Pattern Space
 from .pattern_space import ChaosPatternSpace
 
-# ============================================================
-# 3. Behaviors (B) | 行动层
-# ============================================================
-
+# B - Behaviors
 from .behaviors import (
     PhaseSpaceBehavior,
     VolterraBehavior,
@@ -38,37 +23,21 @@ from .behaviors import (
     LinearTrendBehavior,
 )
 
-# ============================================================
-# 4. Selector (S) | 评估层 - 已修复
-# ============================================================
-
+# S - Selector
 from .selector import ChaosSelector
 
-# ============================================================
-# 5. Decision Strategy (D) | 决策层
-# ============================================================
-
+# D - Decision Strategy
 from .decision import (
     MinErrorStrategy,
     WeightedVoteStrategy,
     AdaptiveStrategy,
 )
 
-# ============================================================
-# 6. Learning Mechanism (Ψ) | 学习层
-# ============================================================
-
+# Ψ - Learning
 from .learning import ErrorLearning, RewardLearning
 
-# ============================================================
-# 7. Main Agent (depends on all above) | 主智能体
-# ============================================================
-
+# Main Agent
 from .metachaos import MetaChaos
-
-# ============================================================
-# Export Interface | 导出接口
-# ============================================================
 
 __all__ = [
     '__version__',
@@ -91,4 +60,4 @@ __all__ = [
     'MetaChaos',
 ]
 
-print(f"✅ Metathin+Chaos v{__version__} loaded (Metathin interface)")
+print(f"✅ Metathin+Chaos v{__version__} loaded")
