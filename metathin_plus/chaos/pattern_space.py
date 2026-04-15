@@ -1,4 +1,5 @@
-# metathin_plus/chaos/pattern_space.py
+# metathin_plus/chaos/pattern_space.py - 修复版本
+
 """
 Chaos Pattern Space (P) | 混沌模式空间 (P)
 ===========================================
@@ -8,6 +9,7 @@ Converts system state to feature vectors for Metathin processing.
 """
 
 import numpy as np
+import logging
 from typing import Any, List, Optional
 from collections import deque
 
@@ -25,7 +27,7 @@ class ChaosPatternSpace(PatternSpace):
     Extracts features from time series of system states.
     从系统状态的时间序列中提取特征。
     
-    Features extracted:
+    Features extracted | 提取的特征:
         - Current value | 当前值
         - Velocity (first difference) | 速度（一阶差分）
         - Acceleration (second difference) | 加速度（二阶差分）
@@ -60,6 +62,9 @@ class ChaosPatternSpace(PatternSpace):
         self.include_acceleration = include_acceleration
         self.include_stats = include_stats
         self._name = name
+        
+        # Initialize logger | 初始化日志记录器
+        self._logger = logging.getLogger(f"metathin_plus.chaos.pattern.{name}")
         
         # History buffer | 历史缓冲区
         self._history: List[float] = []

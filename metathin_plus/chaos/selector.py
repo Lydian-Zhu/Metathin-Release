@@ -1,4 +1,5 @@
-# metathin_plus/chaos/selector.py
+# metathin_plus/chaos/selector.py - 修复循环导入
+
 """
 Chaos Selector (S) | 混沌选择器 (S)
 ====================================
@@ -15,6 +16,7 @@ from metathin.core.s_selector import Selector
 from metathin.core.b_behavior import MetaBehavior
 from metathin.core.types import FeatureVector, FitnessScore, ParameterDict
 
+# 移除循环导入 - 只导入需要的类型
 from .base import PredictionResult
 
 
@@ -57,7 +59,7 @@ class ChaosSelector(Selector):
     def record_prediction(
         self,
         behavior_name: str,
-        prediction: PredictionResult,
+        prediction: Optional[PredictionResult],
         actual_value: float
     ) -> None:
         """
@@ -66,9 +68,15 @@ class ChaosSelector(Selector):
         
         Args:
             behavior_name: Name of the behavior | 行为名称
-            prediction: Prediction result | 预测结果
+            prediction: Prediction result (can be None for initial state) | 预测结果
             actual_value: Actual observed value | 实际观测值
         """
+        # 处理 prediction 为 None 的情况
+        if prediction is None:
+            self._logger.debug(f"Prediction is None for {behavior_name}, skipping")
+            return
+        
+        # 计算误差
         error = abs(prediction.value - actual_value)
         
         if behavior_name not in self._behavior_errors:
@@ -108,7 +116,9 @@ class ChaosSelector(Selector):
         confidences = self._behavior_confidences.get(behavior_name, [])
         
         if not errors:
+            # 没有历史数据，使用默认适应度
             fitness = self.default_fitness
+            self._logger.debug(f"No history for {behavior_name}, using default fitness={fitness}")
         else:
             # Calculate recent error | 计算近期误差
             recent_errors = errors[-self.error_window:] if len(errors) > self.error_window else errors
@@ -126,6 +136,10 @@ class ChaosSelector(Selector):
             
             # Combine | 组合
             fitness = 0.7 * error_fitness + 0.3 * avg_confidence
+            
+            self._logger.debug(f"{behavior_name}: avg_error={avg_error:.4f}, "
+                              f"error_fitness={error_fitness:.4f}, "
+                              f"fitness={fitness:.4f}")
         
         fitness = float(np.clip(fitness, 0.0, 1.0))
         self.record_fitness(behavior_name, fitness)

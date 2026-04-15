@@ -1,4 +1,5 @@
-# metathin_plus/chaos/__init__.py
+# metathin_plus/chaos/__init__.py - 修复导入顺序
+
 """
 Metathin+ Chaos Module - Adapted to Metathin Quintuple Interface
 ================================================================
@@ -13,13 +14,13 @@ __author__ = 'Lydian-Zhu'
 __license__ = 'MIT'
 
 # ============================================================
-# Core Exports | 核心导出
+# 首先导入基础类型（无依赖）
 # ============================================================
 
 from .base import SystemState, PredictionResult, ChaosModel
 
 # ============================================================
-# Quintuple Components | 五元组件
+# 然后导入组件（可能有内部依赖，但无循环）
 # ============================================================
 
 # P - Pattern Space | 感知层
@@ -49,13 +50,13 @@ from .decision import (
 from .learning import ErrorLearning, RewardLearning
 
 # ============================================================
-# Main Agent | 主智能体
+# 最后导入主智能体（依赖上述所有）
 # ============================================================
 
 from .metachaos import MetaChaos
 
 # ============================================================
-# Export Interface | 导出接口
+# 导出接口
 # ============================================================
 
 __all__ = [
