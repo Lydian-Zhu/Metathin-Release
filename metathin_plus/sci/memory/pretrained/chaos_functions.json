@@ -1,0 +1,3256 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "name": "混沌系统函数库",
+    "description": "包含洛伦兹、罗斯勒、杜芬等混沌系统的特征",
+    "created_at": "2026-03-03 16:09:24",
+    "n_functions": 120,
+    "tags": [
+      "chaos",
+      "nonlinear",
+      "dynamics"
+    ]
+  },
+  "functions": [
+    {
+      "id": "56b8aba96b22da0d",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.047041564295048,
+        5.645649591739329,
+        0.011157538234184151,
+        0.25525160240821326,
+        0.0,
+        6.9327779236998985,
+        1.2825632451839124
+      ],
+      "accuracy": 0.9049285693590083,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "1ab822d7b7025c5d",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.451434610396135,
+        6.903934511009866,
+        0.004225265815855074,
+        0.22957300748697063,
+        0.0,
+        4.769691048437428,
+        0.9297629751670052
+      ],
+      "accuracy": 0.9401341515802963,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "aabe553b9748fb70",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.586510030079966,
+        5.033869075676622,
+        -0.0057404766877188216,
+        0.2676950065463713,
+        0.0,
+        7.696135346943205,
+        1.2926104261788738
+      ],
+      "accuracy": 0.9844005479663798,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "61d1e477e98cdb7a",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.643736392472497,
+        5.091708233143902,
+        0.008834829435092553,
+        0.2764420468987011,
+        0.0,
+        7.686203389725706,
+        1.2784970988444317
+      ],
+      "accuracy": 0.9133823854225065,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "98d2340a241da7eb",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.687889956776877,
+        6.753821211422765,
+        0.006241082945755338,
+        0.2472481898720141,
+        0.0,
+        5.088242835339123,
+        0.8891739330778285
+      ],
+      "accuracy": 0.9291927422203955,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "fcf004b94409b9e8",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.557593692215776,
+        5.104207809071273,
+        -4.381113934395467e-05,
+        0.27052217762257835,
+        0.0,
+        7.636622213464372,
+        1.1507253685334886
+      ],
+      "accuracy": 0.9030090147838006,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "14bfffa3dc56279c",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -3.983409502150969,
+        7.15804984550579,
+        0.001970483525586271,
+        0.22479431789226542,
+        0.0,
+        4.294887530144837,
+        0.9681894827675337
+      ],
+      "accuracy": 0.9787660889321724,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "55600fbbc4cf7a4a",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.5469399523875635,
+        5.012724883216163,
+        0.007409150580627473,
+        0.2676476620214379,
+        0.0,
+        7.690858476800082,
+        1.2097729739326697
+      ],
+      "accuracy": 0.9816595490146566,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "d6c436b1b1038941",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.034128499680223,
+        5.653278513040656,
+        0.0034626048021462767,
+        0.2629011059954624,
+        0.0,
+        6.926934274631127,
+        1.2519873432525281
+      ],
+      "accuracy": 0.9475243568367762,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "a06be095363835d3",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -5.672466508114933,
+        6.005386028863448,
+        0.0007079137120117958,
+        0.25317688463776433,
+        0.0,
+        6.401003848960003,
+        0.7996281311381522
+      ],
+      "accuracy": 0.9708770859801958,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "12c3bae44a12b3e5",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.66552738481486,
+        6.742986300255303,
+        -0.0006417380295653238,
+        0.2402326304784231,
+        0.0,
+        5.077047637237078,
+        0.9589993442145642
+      ],
+      "accuracy": 0.9860506139347958,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e379aff2468d334b",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.078627177944563,
+        5.647893553031697,
+        0.008978035069070613,
+        0.2622798640614717,
+        0.0,
+        6.9606465931053805,
+        1.3450353726034239
+      ],
+      "accuracy": 0.9633638156706308,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "05b7f769564842f5",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -5.523288782233547,
+        6.10162834116154,
+        0.004662769149054504,
+        0.24992621502372012,
+        0.0,
+        6.211818058533506,
+        0.857105283358603
+      ],
+      "accuracy": 0.9214824038606986,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "be134ec0dda62521",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.62523950381684,
+        5.042878053037172,
+        0.0046962259253049985,
+        0.2626235957424229,
+        0.0,
+        7.7069589070069995,
+        1.3052230093971395
+      ],
+      "accuracy": 0.9485765561586388,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "8b8acb5e63727473",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.713343546719411,
+        6.754354615637257,
+        0.009168877497930744,
+        0.24263839409304241,
+        0.0,
+        5.10670698797066,
+        0.9174335733328698
+      ],
+      "accuracy": 0.9953549587280002,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "4ba8fbb9f6398411",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.67772700771049,
+        6.746223661900834,
+        0.0017732208416538517,
+        0.24437310398654144,
+        0.0,
+        5.085751144583741,
+        0.9194209139543068
+      ],
+      "accuracy": 0.9829475876312709,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "74c65f41cf69d29a",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.627067461525217,
+        5.069926211127975,
+        0.008908594085644938,
+        0.2726542084697602,
+        0.0,
+        7.692659765078148,
+        1.3345472699382794
+      ],
+      "accuracy": 0.9051114462746667,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "93f130cb6cb9a35c",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -3.48679890080816,
+        7.344675503516244,
+        0.0073533876354649605,
+        0.2196288291457167,
+        0.0,
+        3.976528368675821,
+        0.924727490668167
+      ],
+      "accuracy": 0.9191602651883539,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "c87025b3968842b1",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.031951418960894,
+        5.65056822230064,
+        0.002733647757687805,
+        0.26467123847113905,
+        0.0,
+        6.927399423350459,
+        1.2423141003784606
+      ],
+      "accuracy": 0.9902327885993616,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e939a5fc883b861c",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.719833485910284,
+        6.717045015780198,
+        0.010214784141939956,
+        0.23527983526967083,
+        0.0,
+        5.110304098796226,
+        0.7996546543847267
+      ],
+      "accuracy": 0.9559847506260398,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "172c7845e4617c8a",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.654430802749059,
+        5.048665630662251,
+        -0.002454282042030321,
+        0.2700221958258194,
+        0.0,
+        7.719679734115446,
+        1.3403381164965593
+      ],
+      "accuracy": 0.950482308988873,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "fae6b80e79d7d2be",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.563591344581846,
+        5.079693859510657,
+        0.007725954712952795,
+        0.27261143016787925,
+        0.0,
+        7.655341699019572,
+        1.0778832611205942
+      ],
+      "accuracy": 0.9090679597921218,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "1643b9c800659985",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.364456313255107,
+        5.224347922821288,
+        0.00703595508913735,
+        0.2625512784748681,
+        0.0,
+        7.441076146726023,
+        0.8438352537332633
+      ],
+      "accuracy": 0.9337477715646018,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "fcc8c029ca49777c",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.01516858482983,
+        5.651213278797377,
+        -0.0021548153695164617,
+        0.262123683734268,
+        0.0,
+        6.915025227549113,
+        1.1027318730280333
+      ],
+      "accuracy": 0.9479931978822189,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "894bcd56e2c05233",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -5.023985108738853,
+        6.473091839527871,
+        -0.00021966049823581935,
+        0.24424495231407856,
+        0.0,
+        5.542016700321635,
+        1.0360641072585668
+      ],
+      "accuracy": 0.9815145544474473,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "be1ca98fffcd50fe",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -3.492209334324867,
+        7.324904992768125,
+        0.0075445833466126185,
+        0.21896319819812862,
+        0.0,
+        3.989049178165103,
+        0.9592294967507716
+      ],
+      "accuracy": 0.9224867176638886,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "1774391595e0043b",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -3.6066083095659844,
+        7.284416866739403,
+        -0.006553463702189676,
+        0.21420796950180856,
+        0.0,
+        4.048739910286494,
+        0.825127845973167
+      ],
+      "accuracy": 0.9105172649572351,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "b4b1a583024f595b",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -4.695629078341409,
+        6.74982358832957,
+        0.007714779475003063,
+        0.24552524899432693,
+        0.0,
+        5.095408472464678,
+        0.8929077547420016
+      ],
+      "accuracy": 0.9078125764976883,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "8d1469d3de5b0d8f",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.577156979699248,
+        5.053444428540995,
+        5.607898033827838e-05,
+        0.2711136581915131,
+        0.0,
+        7.679399882211743,
+        0.9682259122564051
+      ],
+      "accuracy": 0.9804017137580855,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "f44ac8295f3a0147",
+      "expression": "lorenz_system",
+      "parameters": {},
+      "feature_vector": [
+        -6.615483825514333,
+        5.091828039638297,
+        0.0064066414552091284,
+        0.2783192359181905,
+        0.0,
+        7.672359911705618,
+        1.1504769294532355
+      ],
+      "accuracy": 0.9674669669236735,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "lorenz",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "37d47d5e42078e3b",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.3219085078050825,
+        3.2624600250001006,
+        0.009096346338467719,
+        0.27493850531768416,
+        0.03,
+        7.9688681696825245,
+        0.08088886164296329
+      ],
+      "accuracy": 0.9728650968226105,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "44269a715ec7a4ec",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.35019640356934917,
+        3.863589803892385,
+        0.006671416630011519,
+        0.24946383330582098,
+        0.04,
+        6.4711776339867395,
+        0.13112919953728638
+      ],
+      "accuracy": 0.964324667330641,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "1a552495e0f639d7",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.06713028998882642,
+        2.9271678735027815,
+        -0.00043488091189350516,
+        0.28224361299670575,
+        0.03,
+        7.68892819690212,
+        0.06888029763327828
+      ],
+      "accuracy": 0.9457303916841752,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "19d5472c8cf29326",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.46492215764969436,
+        2.599520660856738,
+        0.005739932882903416,
+        0.3085029186991378,
+        0.03,
+        5.735668752100052,
+        0.09720615627969778
+      ],
+      "accuracy": 0.919780301924596,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "6dd7b77a0ebec51f",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.4231413176926707,
+        2.624149522072791,
+        0.018968596913945215,
+        0.32449712204128467,
+        0.02,
+        5.51414752781134,
+        0.0705984428897654
+      ],
+      "accuracy": 0.9013113063399483,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "742944b8a62d55a6",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.47838249461877425,
+        3.8097498467772355,
+        0.008750815678285942,
+        0.25943163040706224,
+        0.04,
+        5.849969458613174,
+        0.13168343672390084
+      ],
+      "accuracy": 0.9801284318465827,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e3a9ad69855c6a32",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.22129919037905676,
+        2.49489089384264,
+        -0.002179118159483397,
+        0.33074464519078345,
+        0.02,
+        5.636975327794705,
+        0.04276405635250365
+      ],
+      "accuracy": 0.9184538571545166,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5e1e74e7334a77b0",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.4551702666408917,
+        3.851081563926318,
+        0.00910404239472595,
+        0.2683685539209719,
+        0.04,
+        5.563898403075998,
+        0.0739280006660803
+      ],
+      "accuracy": 0.9270992831959013,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "b44ed95595c3095f",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.4800272152156313,
+        3.810724983886526,
+        0.00900393313872039,
+        0.25969249840551645,
+        0.04,
+        5.8418123687148125,
+        0.13044019320386466
+      ],
+      "accuracy": 0.9925955348265909,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "02ca8f9b8b2b7b08",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.24518749102952994,
+        3.228978337444663,
+        0.005315196901734799,
+        0.276387386054051,
+        0.03,
+        7.966415941099432,
+        0.035151332729280664
+      ],
+      "accuracy": 0.988413094047487,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "846fc3341dd72bf0",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.2081548745621007,
+        4.0090191897919425,
+        0.006851493356224423,
+        0.24328833786651313,
+        0.04,
+        6.911974791200106,
+        0.12547789644396348
+      ],
+      "accuracy": 0.9376701873172442,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e8ff534250b6d982",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.14736489605157915,
+        3.1553045588814133,
+        0.001296937179502961,
+        0.2778796814168937,
+        0.03,
+        7.9300662868081835,
+        0.025707235968247175
+      ],
+      "accuracy": 0.9936441649713976,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "0189b1ec17cdf696",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.06676002226505436,
+        3.072818379792181,
+        -0.0023591467870785502,
+        0.27987162276442057,
+        0.03,
+        7.873686922377846,
+        0.03572994403091038
+      ],
+      "accuracy": 0.9674816677973253,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5d9c7cfbd43dacfc",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.47709316870741103,
+        3.835894729035228,
+        0.006106244751877924,
+        0.26819474813564975,
+        0.04,
+        5.621389950563043,
+        0.09612251304753118
+      ],
+      "accuracy": 0.9362442528644787,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "61c752c2a11012e1",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.09533648367956936,
+        4.137481540769456,
+        0.004224819024317661,
+        0.242215486275274,
+        0.04,
+        7.151828018090598,
+        0.09576082581008759
+      ],
+      "accuracy": 0.9527785074838051,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "2019856f5aee8e9a",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.48075186983577284,
+        2.61095272843869,
+        0.005268013795405803,
+        0.31331542418166936,
+        0.03,
+        5.602978671350805,
+        0.08827978269225356
+      ],
+      "accuracy": 0.9286755212777005,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "c911b2bca2771499",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.4946876467033593,
+        3.8125624165150223,
+        0.007693242451023859,
+        0.2612492438700918,
+        0.04,
+        5.768045142227651,
+        0.12485079759319896
+      ],
+      "accuracy": 0.9438722802430504,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "7353de76db6baaf7",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.48256911689096244,
+        3.8137043845843275,
+        0.00822960826817531,
+        0.2591921185421412,
+        0.04,
+        5.833290829443162,
+        0.13547104078254338
+      ],
+      "accuracy": 0.950620440363561,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "84f26aa0aade75c5",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.2102599390293522,
+        3.2671230508955316,
+        0.008129937174569972,
+        0.2811959921062036,
+        0.03,
+        6.72240122349415,
+        0.07697916755604563
+      ],
+      "accuracy": 0.9572458981641451,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "aee38478543fa1b0",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.2846544319285372,
+        2.554055196790914,
+        1.9181320496432133e-05,
+        0.33003070315267075,
+        0.02,
+        5.571892761070182,
+        0.03214392217115863
+      ],
+      "accuracy": 0.9892108573006696,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "fb4245b29889e3cb",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.30258889006645673,
+        2.5699829038685507,
+        -0.0005045432147109677,
+        0.3309375122926433,
+        0.02,
+        5.543763662285611,
+        0.0548495059849862
+      ],
+      "accuracy": 0.936358958873622,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "68f2c136840e3e26",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.0816815313316262,
+        3.092441122187905,
+        -0.00976002759121472,
+        0.28048912580762847,
+        0.03,
+        7.865572592595532,
+        0.02951133778423423
+      ],
+      "accuracy": 0.9491429308835297,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "9b68d47b565a13f0",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.0019479187413876974,
+        4.249359717538524,
+        -0.004517596447672043,
+        0.2380914260454952,
+        0.04,
+        7.322341698633206,
+        0.0847576909409604
+      ],
+      "accuracy": 0.9750707770851125,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "a076ef842ce30b30",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.3538076803809764,
+        3.2587273042633,
+        0.0057619853550118,
+        0.27476865634828285,
+        0.03,
+        7.930301272961103,
+        0.14291211827848532
+      ],
+      "accuracy": 0.9244448861456951,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "f9df3c02000b2d6c",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.2788410794834693,
+        2.6933757619664225,
+        0.0051578738648255795,
+        0.29055336411794647,
+        0.03,
+        6.960179654101635,
+        0.08503036971296629
+      ],
+      "accuracy": 0.9923020090171207,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "ef906da2423f1701",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.025342526351781487,
+        2.9721242781508903,
+        -0.0008812160439688802,
+        0.28151006491491465,
+        0.03,
+        7.754266052939311,
+        0.05528898749285673
+      ],
+      "accuracy": 0.9838778712745996,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "faab4a982fe6cd20",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        0.09500376196787405,
+        4.3324118246381405,
+        0.010183360261722868,
+        0.23532710914400864,
+        0.04,
+        7.4578976521818445,
+        0.07851017313356148
+      ],
+      "accuracy": 0.9191879620435583,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5ed422f6dd0802f4",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.2184092983400287,
+        3.7067628334814122,
+        -0.005958825736070837,
+        0.28016352414905066,
+        0.03,
+        5.6221162088256795,
+        0.08200207948561983
+      ],
+      "accuracy": 0.9128539409812282,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e31ac21059a28b81",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.4199914832669532,
+        3.8190522610015902,
+        0.0076719042328115186,
+        0.2536193195299766,
+        0.04,
+        6.150703434263235,
+        0.13263766005413646
+      ],
+      "accuracy": 0.9813429941113965,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "c8e92c6e74e1a5b2",
+      "expression": "rossler_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.07006829556848934,
+        4.170372942323395,
+        0.0014025250758472932,
+        0.241116490598018,
+        0.04,
+        7.215316152643494,
+        0.09220451666613065
+      ],
+      "accuracy": 0.946065775808435,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "rossler",
+        "strange-attractor"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "d5f3caffe8969975",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.047928383733841014,
+        0.6977842183532819,
+        -0.0008148068841564996,
+        0.5191810760739308,
+        0.04,
+        6.231599622314089,
+        0.18054308716396777
+      ],
+      "accuracy": 0.9103908700076506,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "0a326ef195c4feac",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.043888913526817674,
+        0.6705912863134382,
+        0.01193821758486443,
+        0.5304110764048232,
+        0.03,
+        5.9558271568384376,
+        0.08014252116074608
+      ],
+      "accuracy": 0.9889948075472323,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "ab1473f34adb6578",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.05563328068304397,
+        0.6807494895806141,
+        0.0009379842504853564,
+        0.5403847431231834,
+        0.03,
+        8.12299108233322,
+        0.06043947019225857
+      ],
+      "accuracy": 0.9572892211373744,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "9bdc8c3d963a470d",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.04100012372100404,
+        0.6832011940444691,
+        -0.0021781757366903243,
+        0.5202265537054617,
+        0.04,
+        6.089860946012457,
+        0.1980864336387606
+      ],
+      "accuracy": 0.9139269416743656,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "c3ee9456cfbd9784",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.05110315683696452,
+        0.6742575232364771,
+        0.010993454903313797,
+        0.5447744113504622,
+        0.03,
+        8.345649309300672,
+        0.10956310644083937
+      ],
+      "accuracy": 0.9489252697422434,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "23d5d1072e709667",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.005643017347065417,
+        0.6907087819111608,
+        0.015121780487118921,
+        0.5301926704905996,
+        0.04,
+        6.493464608675626,
+        0.05999698384623794
+      ],
+      "accuracy": 0.9777892189529269,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5788177694934306",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.0025792872096081433,
+        0.6681449540958391,
+        -0.005420806890247848,
+        0.5490992901551315,
+        0.03,
+        9.49507601386341,
+        0.11365716362023026
+      ],
+      "accuracy": 0.9662384828596372,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e286fbd98d4d99e4",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.0061408773089044995,
+        0.6971649203751887,
+        -0.013492696490483408,
+        0.5251847231317547,
+        0.05,
+        6.9524105700045675,
+        0.10646029661647954
+      ],
+      "accuracy": 0.9676797067979245,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "41190df0ac0ca5a5",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.03428407622814142,
+        0.6886228205884897,
+        0.0032644389384862424,
+        0.5364338278304226,
+        0.04,
+        8.520614261132453,
+        0.12172442395337198
+      ],
+      "accuracy": 0.9296981041104823,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "033f35d07d16e153",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.005325166988218835,
+        0.6804101593191946,
+        -0.010813006256357031,
+        0.5261929599549532,
+        0.04,
+        5.559319162999109,
+        0.14506835689120576
+      ],
+      "accuracy": 0.9028217917279039,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "7353bb4f25f1fb34",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.013511016425235991,
+        0.6969698871541344,
+        0.008567844611922476,
+        0.5252617746138623,
+        0.05,
+        7.383975695439054,
+        0.10844425687842059
+      ],
+      "accuracy": 0.9748217704174635,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "eee3c05b1f5ea499",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.03624198954033935,
+        0.6881130261879167,
+        0.013016056032018112,
+        0.5363717354181916,
+        0.04,
+        8.303670452825019,
+        0.08449647205174622
+      ],
+      "accuracy": 0.969912169018323,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "62cc4265ce3d942b",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.05283245193231975,
+        0.6726725319690783,
+        0.013957418983317036,
+        0.5321260814004453,
+        0.03,
+        6.749470089924834,
+        0.07792962364671038
+      ],
+      "accuracy": 0.9963113052645467,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "726445c143dfe7af",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.011476837982728003,
+        0.6807575894298047,
+        0.006086691819976854,
+        0.5395153038363102,
+        0.04,
+        9.454020208793217,
+        0.1035068519996135
+      ],
+      "accuracy": 0.9497320976771139,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "75db7a5d2dc5050f",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.03934925295768081,
+        0.6610498047294171,
+        0.005782381545252133,
+        0.5489164867856583,
+        0.03,
+        9.176184088679674,
+        0.051186689745042695
+      ],
+      "accuracy": 0.9721353535763388,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "3d33b984f6fe40c5",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.008902581863701735,
+        0.6883574498180269,
+        0.006043610802973799,
+        0.5245058705675208,
+        0.05,
+        6.216550645716005,
+        0.14743278192507003
+      ],
+      "accuracy": 0.9760438109333027,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5f7d602b25cc71a4",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.010119276503642572,
+        0.6763701081435555,
+        0.01385323565450128,
+        0.5452277625943747,
+        0.03,
+        9.31688921729218,
+        0.13678486596977865
+      ],
+      "accuracy": 0.9510547239722437,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "432b971fbf83b5a8",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.017651392294331537,
+        0.6958490478820871,
+        0.0009687748376115023,
+        0.5280857158902161,
+        0.05,
+        7.896155671233572,
+        0.12422935550034835
+      ],
+      "accuracy": 0.9757944728488499,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "a8c97d0934015d93",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.01850174003053662,
+        0.6913025675211752,
+        -0.004340335723937514,
+        0.5304859017422804,
+        0.04,
+        8.989464537777517,
+        0.10897256857039739
+      ],
+      "accuracy": 0.9238380384671282,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "0b7b21c7c3aeb93d",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.06190780922223413,
+        0.6814278045381286,
+        0.006930906450251763,
+        0.5399449884776036,
+        0.03,
+        7.802836875235962,
+        0.12602403578344099
+      ],
+      "accuracy": 0.927178365138814,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5d3f9e44afa2fa43",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.022227620772501306,
+        0.6828633447708229,
+        0.003299284509964952,
+        0.5264396024827511,
+        0.04,
+        5.712405542397233,
+        0.11843502789712532
+      ],
+      "accuracy": 0.9367694169406421,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "95449f5409d097c7",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.004079174652681621,
+        0.6883854275609239,
+        -0.005904374074671421,
+        0.5327326712008676,
+        0.04,
+        9.408980294371805,
+        0.12881748819355077
+      ],
+      "accuracy": 0.9464225315925241,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "2254be763c29917c",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.026004363929404414,
+        0.6660838295371192,
+        -0.0032111058487009425,
+        0.5468509966800492,
+        0.03,
+        9.353674166953947,
+        0.22128360070631847
+      ],
+      "accuracy": 0.9164697504410761,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "bccd2d66b723a4a1",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.044219713091541844,
+        0.6681115661051868,
+        0.013215079457069389,
+        0.5311074268723475,
+        0.03,
+        5.921710550871452,
+        0.07776335271163101
+      ],
+      "accuracy": 0.9813481489600145,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "f6b1023997446047",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.03823313104370239,
+        0.6660990048033812,
+        0.000324535000952401,
+        0.5502656687390864,
+        0.03,
+        8.912301435324041,
+        0.12183565189861055
+      ],
+      "accuracy": 0.9409107056811759,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "d14987c2885a9d1f",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.01757899898396693,
+        0.6907462196320453,
+        0.0034122008851989252,
+        0.5357743980061316,
+        0.04,
+        9.01944456862726,
+        0.09392148470188214
+      ],
+      "accuracy": 0.9983412171072144,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "ab0d274f5b85f03b",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.03426354120617319,
+        0.6869217717386411,
+        0.005471788207485647,
+        0.5343194845885451,
+        0.04,
+        8.553283606942015,
+        0.10710479203312274
+      ],
+      "accuracy": 0.9773504224802062,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "d6c94e5a11444578",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.0016189859547065,
+        0.6858265818591832,
+        0.012496729490815697,
+        0.5370120831900784,
+        0.04,
+        9.359118702458618,
+        0.11655135506186724
+      ],
+      "accuracy": 0.9825633570995008,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "04150f43f08b05d6",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        0.025118425752487142,
+        0.6931202381966031,
+        0.0074777428173429875,
+        0.532909101783487,
+        0.04,
+        8.80447108238579,
+        0.09243671370858356
+      ],
+      "accuracy": 0.9613264653699463,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "af66f33bd5d603e8",
+      "expression": "duffing_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.0027502944658747497,
+        0.6939868754431066,
+        0.004477463299626256,
+        0.5251427134869667,
+        0.05,
+        6.805352263441847,
+        0.11604359069466379
+      ],
+      "accuracy": 0.9862479055854007,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "duffing",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "7aa9e9df5a50dea4",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.06805953339395597,
+        1.446738645882232,
+        0.018759302137222725,
+        0.342865137178732,
+        0.03,
+        8.44627508587402,
+        0.054034075868505616
+      ],
+      "accuracy": 0.9886526478759411,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "d007e0d93bf1d62f",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.019879488435105664,
+        1.4622449214668214,
+        0.0037728495606834827,
+        0.32968892999772104,
+        0.04,
+        7.063162307165308,
+        0.08558483788963368
+      ],
+      "accuracy": 0.9122660646619019,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "544e2a2a3e77952f",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.023185995549490048,
+        1.4542780154805905,
+        -0.0014133542594080071,
+        0.3449350910321272,
+        0.03,
+        7.174710909116288,
+        0.08110970809024395
+      ],
+      "accuracy": 0.9340015953965821,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "eb351798861b490b",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.0741238852233068,
+        1.4331327678889665,
+        0.0011559196431233992,
+        0.33173876521815426,
+        0.04,
+        5.574485750074303,
+        0.07418122022055808
+      ],
+      "accuracy": 0.9444799188400538,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "f56791de228b325d",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.04051387862660252,
+        1.4472609833852244,
+        -0.0012440664400304587,
+        0.33123692970005725,
+        0.03,
+        9.682457775239738,
+        0.02103779653923995
+      ],
+      "accuracy": 0.9758147709099548,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "9a92fdda38b57408",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.14879757598313773,
+        1.407433601583738,
+        0.017844139762183877,
+        0.3374653904872422,
+        0.02,
+        6.128812067951445,
+        0.11551443263813223
+      ],
+      "accuracy": 0.9102784242046673,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "568572ebe27d0ce6",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.005285248374786757,
+        1.4608108658328318,
+        0.011462858052415589,
+        0.330867961578707,
+        0.04,
+        6.6353696316300725,
+        0.06583702843983247
+      ],
+      "accuracy": 0.9366898542726732,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e4b3d483a6f3800a",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.07084021551808757,
+        1.4466483285535625,
+        -0.0009516812265275823,
+        0.34109544559301946,
+        0.03,
+        8.394726260371073,
+        0.06008562398455509
+      ],
+      "accuracy": 0.9650790425387339,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e7c82b283df17cea",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.1342302184960759,
+        1.4284066933277573,
+        0.01191191647708253,
+        0.3316021758024761,
+        0.03,
+        6.626629263002398,
+        0.12186060693629755
+      ],
+      "accuracy": 0.9102889740047423,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "a5879467ae7070be",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.009489887304251897,
+        1.4579890507700202,
+        -0.0033848440123727427,
+        0.3321830327500861,
+        0.04,
+        6.406157372300933,
+        0.06922079300064288
+      ],
+      "accuracy": 0.9220124454142375,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "b91862fb45f6c6ae",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.1176851517663237,
+        1.4491695179644823,
+        0.012433948869301088,
+        0.330565683982042,
+        0.03,
+        8.319697014798138,
+        0.04464156531203376
+      ],
+      "accuracy": 0.9915860035004951,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "476fe31402025810",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.08049575411983433,
+        1.4354942116224445,
+        -0.019213213573057168,
+        0.3442355198334089,
+        0.03,
+        5.646148424051391,
+        0.08270703698696444
+      ],
+      "accuracy": 0.9101445811472921,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "f330652936d1ce7d",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.09941707253461524,
+        1.4537284183455774,
+        0.010621183909798547,
+        0.33050175197802395,
+        0.03,
+        8.888325459106678,
+        0.017523591317545568
+      ],
+      "accuracy": 0.999080294838337,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "ffa7ab02ec598ab1",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.1622089958395518,
+        1.4092508250969156,
+        0.00299427196515454,
+        0.34211363385429966,
+        0.02,
+        5.928283229104389,
+        0.08523692300419097
+      ],
+      "accuracy": 0.9336498230891944,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "91c35112f698eccd",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.18388513647148863,
+        1.4413364482226423,
+        0.011617568221383566,
+        0.3368165305469715,
+        0.02,
+        7.871082331060379,
+        0.04531552587035487
+      ],
+      "accuracy": 0.9839191948582502,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "a63904a36937b3d6",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.049594849077210096,
+        1.4557792744611304,
+        -0.0012871956177442818,
+        0.3289164591029493,
+        0.03,
+        9.555751602891199,
+        0.01347197352724653
+      ],
+      "accuracy": 0.9308104802307307,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "122b5e04e57177a3",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.12487845727596467,
+        1.4484149820211718,
+        0.009566653671480338,
+        0.3298367168791101,
+        0.03,
+        8.15298116282614,
+        0.04847089136261807
+      ],
+      "accuracy": 0.977573069053944,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "189238af7d5e4364",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.13274265628560242,
+        1.4313107889619918,
+        0.005665061204037487,
+        0.33178060854311237,
+        0.03,
+        6.980104875622922,
+        0.08963462810737916
+      ],
+      "accuracy": 0.97627509125032,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "2e4c88324ff78ba5",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.06962925500911822,
+        1.4569122847568348,
+        0.0035466606973642203,
+        0.3448503029290171,
+        0.03,
+        8.220784575746569,
+        0.0898599078377836
+      ],
+      "accuracy": 0.9253508594881976,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "7207860ad751ca13",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.11310745264972852,
+        1.456676809021379,
+        0.005639297994407831,
+        0.3263383857271736,
+        0.03,
+        8.1651708551102,
+        0.07005525129326136
+      ],
+      "accuracy": 0.9150776589505822,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "040be7a27600a5a0",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.12033162657694373,
+        1.4495931992680005,
+        0.006628787760296065,
+        0.3297554803862449,
+        0.03,
+        8.069454654637743,
+        0.06244368342559222
+      ],
+      "accuracy": 0.9431691396664529,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "b370142fbeaf858e",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.1612955147971974,
+        1.4099816568049406,
+        0.0039392932696982975,
+        0.342953027353255,
+        0.02,
+        6.096736922401056,
+        0.07020131455989793
+      ],
+      "accuracy": 0.9632284196940566,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "ec965799f4aaf6c3",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.02212156922939819,
+        1.4583723172950072,
+        0.00015878314578273006,
+        0.34596073909268416,
+        0.03,
+        7.27659166277822,
+        0.06019796779718969
+      ],
+      "accuracy": 0.9756010356620917,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "5049b51acf0ac5dc",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.0403301611103889,
+        1.4525138972805964,
+        0.0031291297980943792,
+        0.3327971950533858,
+        0.04,
+        7.949583935438345,
+        0.09312354088738714
+      ],
+      "accuracy": 0.960690227533324,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "536f63b78eb9ef57",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.006347755206191641,
+        1.4550609577246596,
+        0.006450270992650248,
+        0.33151826446418947,
+        0.04,
+        6.519214658477394,
+        0.06834250114126607
+      ],
+      "accuracy": 0.9368861374002737,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "a8e005e99d37c3ac",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.08692199729736652,
+        1.418185947735681,
+        0.012103883526948796,
+        0.3338184463144718,
+        0.03,
+        5.619309318083608,
+        0.09738330612671621
+      ],
+      "accuracy": 0.9497362906894808,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "b46b93ea13726c20",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.08166861715226105,
+        1.457842998991239,
+        0.004137174375816002,
+        0.32987134495741444,
+        0.03,
+        9.248777946442493,
+        0.019571427863357117
+      ],
+      "accuracy": 0.9507482306181136,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "9acea22844e3b93e",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.031004553082791483,
+        1.452959135148761,
+        -0.001458476932587275,
+        0.34756061432009167,
+        0.03,
+        5.98579722702985,
+        0.09368632160063924
+      ],
+      "accuracy": 0.9277547884738495,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "b35e18a5f360573a",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        -0.037198643331310795,
+        1.460327366823418,
+        0.009899192061231146,
+        0.345539887988095,
+        0.03,
+        7.540822495861145,
+        0.0534003971926197
+      ],
+      "accuracy": 0.9975684033568546,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    },
+    {
+      "id": "e3349915161bf3b6",
+      "expression": "van_der_pol_system",
+      "parameters": {},
+      "feature_vector": [
+        0.11884985649787427,
+        1.4498190580377475,
+        0.03125249908981469,
+        0.33044253137901125,
+        0.03,
+        8.264890890314833,
+        0.0439740511076175
+      ],
+      "accuracy": 0.9822889320592951,
+      "usage_count": 0,
+      "domain": [
+        0,
+        20
+      ],
+      "tags": [
+        "chaos",
+        "van-der-pol",
+        "oscillator"
+      ],
+      "source": "trained_chaos",
+      "complexity": 5
+    }
+  ]
+}
