@@ -25,6 +25,8 @@ Design Philosophy | 设计理念:
       可观测：返回详细的执行结果
 """
 
+from __future__ import annotations
+
 import time
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
@@ -55,9 +57,9 @@ from .context import ThinkingContext, PerceiveResult, HypothesizeResult, DecideR
 class PipelineResult:
     """
     Result of running the thinking pipeline.
-    
+
     运行思考流水线的结果。
-    
+
     Attributes | 属性:
         success: Whether the pipeline completed successfully | 流水线是否成功完成
         result: Execution result (if successful) | 执行结果（如果成功）
@@ -83,15 +85,15 @@ class PipelineResult:
 class ThinkingPipeline:
     """
     Pure function pipeline for the cognitive cycle.
-    
+
     认知循环的纯函数流水线。
-    
+
     This class encapsulates the thinking logic but maintains no state.
     All state is passed via the ThinkingContext.
-    
+
     这个类封装了思考逻辑，但不维护任何状态。
     所有状态都通过 ThinkingContext 传递。
-    
+
     Usage | 使用:
         >>> pipeline = ThinkingPipeline()
         >>> result = pipeline.run(
@@ -104,13 +106,13 @@ class ThinkingPipeline:
         ... )
         >>> print(result.result)
     """
-    
+
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
         Initialize the pipeline with configuration.
-        
+
         使用配置初始化流水线。
-        
+
         Args | 参数:
             config: Pipeline configuration (min_fitness_threshold, enable_learning, etc.)
                     流水线配置（min_fitness_threshold、enable_learning 等）
@@ -118,7 +120,7 @@ class ThinkingPipeline:
         self.config = config or {}
         self.min_fitness_threshold = self.config.get('min_fitness_threshold', 0.0)
         self.enable_learning = self.config.get('enable_learning', True)
-    
+
     def run(
         self,
         raw_input: Any,
@@ -132,13 +134,13 @@ class ThinkingPipeline:
     ) -> PipelineResult:
         """
         Execute the complete thinking pipeline.
-        
+
         执行完整的思考流水线。
-        
+
         This is the main entry point - orchestrates all five stages.
-        
+
         这是主入口——编排所有五个阶段。
-        
+
         Args | 参数:
             raw_input: Raw input data | 原始输入数据
             pattern_space: Pattern space for feature extraction (P) | 特征提取的模式空间 (P)
@@ -149,7 +151,7 @@ class ThinkingPipeline:
                                 参数更新的学习机制 (Ψ，可选)
             expected: Expected result (for learning) | 期望结果（用于学习）
             context_params: Additional context parameters | 额外的上下文参数
-            
+
         Returns | 返回:
             PipelineResult: Result containing output, timing, and status
                             包含输出、计时和状态的结果
@@ -160,7 +162,7 @@ class ThinkingPipeline:
             expected=expected,
             context_params=context_params or {},
         )
-        
+
         # ============================================================
         # Stage 1: Perceive (P) | 阶段1：感知
         # ============================================================
@@ -169,7 +171,7 @@ class ThinkingPipeline:
             features = pattern_space.extract(raw_input)
             perceive_duration = time.time() - perceive_start
             context = context.with_stage_time('perceive', perceive_duration)
-            
+
             # Update context with features | 用特征更新上下文
             context = ThinkingContext(
                 raw_input=context.raw_input,
@@ -198,7 +200,7 @@ class ThinkingPipeline:
                 error=PatternExtractionError(f"Feature extraction failed: {e}"),
                 context=context.with_error(e, 'perceive'),
             )
-        
+
         # ============================================================
         # Stage 2: Hypothesize (S) | 阶段2：假设
         # ============================================================
@@ -209,7 +211,7 @@ class ThinkingPipeline:
             )
             hypothesize_duration = time.time() - hypothesize_start
             context = context.with_stage_time('hypothesize', hypothesize_duration)
-            
+
             # Update context with fitness scores | 用适应度分数更新上下文
             context = ThinkingContext(
                 raw_input=context.raw_input,
@@ -238,7 +240,7 @@ class ThinkingPipeline:
                 error=e,
                 context=context.with_error(e, 'hypothesize'),
             )
-        
+
         # Check if any behaviors are available | 检查是否有可用行为
         if not candidates:
             return PipelineResult(
@@ -250,14 +252,14 @@ class ThinkingPipeline:
                 error=NoBehaviorError("No behaviors available for current state"),
                 context=context,
             )
-        
+
         # ============================================================
         # Stage 3: Decide (D) | 阶段3：决策
         # ============================================================
         try:
             decide_start = time.time()
             selected = decision_strategy.select(
-                candidates, 
+                candidates,
                 [fitness_scores[b.name] for b in candidates],
                 features
             )
@@ -266,7 +268,7 @@ class ThinkingPipeline:
             )
             decide_duration = time.time() - decide_start
             context = context.with_stage_time('decide', decide_duration)
-            
+
             # Update context with selected behavior | 用选中的行为更新上下文
             context = ThinkingContext(
                 raw_input=context.raw_input,
@@ -295,7 +297,7 @@ class ThinkingPipeline:
                 error=DecisionError(f"Decision failed: {e}"),
                 context=context.with_error(e, 'decide'),
             )
-        
+
         # ============================================================
         # Stage 4: Execute (B) | 阶段4：执行
         # ============================================================
@@ -304,7 +306,7 @@ class ThinkingPipeline:
             result = selected.execute(features, **context_params or {})
             execute_duration = time.time() - execute_start
             context = context.with_stage_time('execute', execute_duration)
-            
+
             # Update context with execution result | 用执行结果更新上下文
             context = ThinkingContext(
                 raw_input=context.raw_input,
@@ -333,7 +335,7 @@ class ThinkingPipeline:
                 error=BehaviorExecutionError(f"Behavior execution failed: {e}"),
                 context=context.with_error(e, 'execute'),
             )
-        
+
         # ============================================================
         # Stage 5: Learn (Ψ) | 阶段5：学习
         # ============================================================
@@ -350,7 +352,7 @@ class ThinkingPipeline:
                 )
                 learn_duration = time.time() - learn_start
                 context = context.with_stage_time('learn', learn_duration)
-                
+
                 # Update context with learning results | 用学习结果更新上下文
                 context = ThinkingContext(
                     raw_input=context.raw_input,
@@ -373,7 +375,7 @@ class ThinkingPipeline:
                 # Learning failure doesn't fail the entire pipeline | 学习失败不会导致整个流水线失败
                 # Just record the error in context | 只在上下文中记录错误
                 context = context.with_error(e, 'learn')
-        
+
         # ============================================================
         # Return successful result | 返回成功结果
         # ============================================================
@@ -386,7 +388,7 @@ class ThinkingPipeline:
             error=None,
             context=context,
         )
-    
+
     def _hypothesize(
         self,
         behaviors: List[MetaBehavior],
@@ -395,39 +397,39 @@ class ThinkingPipeline:
     ) -> tuple[List[MetaBehavior], Dict[str, float]]:
         """
         Hypothesize stage: compute fitness for all behaviors.
-        
+
         假设阶段：计算所有行为的适应度。
-        
+
         Args | 参数:
             behaviors: List of available behaviors | 可用行为列表
             selector: Selector for fitness computation | 计算适应度的选择器
             features: Feature vector | 特征向量
-            
+
         Returns | 返回:
             tuple: (candidate_behaviors, fitness_scores)
                    (候选行为列表, 适应度分数字典)
         """
         candidates = []
         fitness_scores = {}
-        
+
         for behavior in behaviors:
             # Check if behavior can execute | 检查行为是否可执行
             if not behavior.can_execute(features):
                 continue
-            
+
             # Compute fitness | 计算适应度
             fitness = selector.compute_fitness(behavior, features)
-            
+
             # Record fitness for analysis | 记录适应度用于分析
             selector.record_fitness(behavior.name, fitness)
             fitness_scores[behavior.name] = fitness
-            
+
             # Check against threshold | 检查阈值
             if fitness >= self.min_fitness_threshold:
                 candidates.append(behavior)
-        
+
         return candidates, fitness_scores
-    
+
     def _learn(
         self,
         learning_mechanism: LearningMechanism,
@@ -439,9 +441,9 @@ class ThinkingPipeline:
     ) -> tuple[bool, Dict[str, float]]:
         """
         Learn stage: update selector parameters based on feedback.
-        
+
         学习阶段：基于反馈更新选择器参数。
-        
+
         Args | 参数:
             learning_mechanism: Learning mechanism | 学习机制
             selector: Selector to update | 要更新的选择器
@@ -449,7 +451,7 @@ class ThinkingPipeline:
             actual: Actual result | 实际结果
             features: Feature vector | 特征向量
             behavior_name: Name of executed behavior | 执行的行为名称
-            
+
         Returns | 返回:
             tuple: (learning_occurred, parameter_changes)
                    (是否发生学习, 参数变化字典)
@@ -457,7 +459,7 @@ class ThinkingPipeline:
         # Check if learning should occur | 检查是否应该学习
         if not learning_mechanism.should_learn(expected, actual):
             return False, {}
-        
+
         # Build context for learning | 构建学习上下文
         context = {
             'features': features,
@@ -466,15 +468,15 @@ class ThinkingPipeline:
             'expected': expected,
             'actual': actual,
         }
-        
+
         # Compute adjustment | 计算调整量
         adjustment = learning_mechanism.compute_adjustment(expected, actual, context)
-        
+
         # Apply adjustment if any | 如果有调整量则应用
         if adjustment:
             selector.update_parameters(adjustment)
             return True, adjustment
-        
+
         return False, {}
 
 
