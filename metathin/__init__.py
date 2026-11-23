@@ -140,6 +140,7 @@ _COMPONENTS_MODULES = {
     'MemoryLearning': 'metathin.components.learning',
     'HebbianLearning': 'metathin.components.learning',
     'EnsembleLearning': 'metathin.components.learning',
+    'BehaviorFeedbackLearning': 'metathin.components.learning',
     'Experience': 'metathin.components.learning',
 }
 
@@ -299,5 +300,6 @@ __all__ = [
     'MemoryLearning',
     'HebbianLearning',
     'EnsembleLearning',
+    'BehaviorFeedbackLearning',
     'Experience',
 ]

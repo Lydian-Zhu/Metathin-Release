@@ -349,6 +349,7 @@ class ThinkingPipeline:
                     result,
                     features,
                     selected.name,
+                    reward=context_params.get('reward') if context_params else None,
                 )
                 learn_duration = time.time() - learn_start
                 context = context.with_stage_time('learn', learn_duration)
@@ -438,6 +439,7 @@ class ThinkingPipeline:
         actual: Any,
         features: FeatureVector,
         behavior_name: str,
+        reward: Optional[float] = None,
     ) -> tuple[bool, Dict[str, float]]:
         """
         Learn stage: update selector parameters based on feedback.
@@ -461,12 +463,19 @@ class ThinkingPipeline:
             return False, {}
 
         # Build context for learning | 构建学习上下文
+        behavior_index = None
+        mapping = getattr(selector, '_behavior_indices', None)
+        if isinstance(mapping, dict):
+            behavior_index = mapping.get(behavior_name)
+
         context = {
             'features': features,
             'behavior_name': behavior_name,
+            'behavior_index': behavior_index,
             'parameters': selector.get_parameters(),
             'expected': expected,
             'actual': actual,
+            'reward': reward,
         }
 
         # Compute adjustment | 计算调整量
@@ -475,8 +484,25 @@ class ThinkingPipeline:
         # Apply adjustment if any | 如果有调整量则应用
         if adjustment:
             selector.update_parameters(adjustment)
-            return True, adjustment
 
+        # Optional post-update (e.g. Hebbian weight normalization)
+        if hasattr(learning_mechanism, 'post_update'):
+            mid = selector.get_parameters()
+            after = learning_mechanism.post_update(mid.copy())
+            if after:
+                delta = {k: after[k] - mid.get(k, 0.0) for k in after
+                         if abs(after[k] - mid.get(k, 0.0)) > 1e-12}
+                if delta:
+                    selector.update_parameters(delta)
+
+        # Persist experience for memory/replay learners
+        if hasattr(learning_mechanism, 'record_experience'):
+            learning_mechanism.record_experience(
+                features, behavior_name, expected, actual, reward or 0.0
+            )
+
+        if adjustment:
+            return True, adjustment
         return False, {}
 
 

@@ -160,7 +160,10 @@ from metathin.components.learning import (
     
     EnsembleLearning,      # Ensemble learning - combines multiple learners
                          # Can use boosting, bagging, or stacking
-    
+
+    BehaviorFeedbackLearning,  # Behavior-level negative feedback
+                               # Penalizes the selected behavior on error
+
     Experience,            # Experience sample - data class for memory learning
                          # Stores (features, behavior, reward, next_features) tuples
 )
@@ -216,6 +219,7 @@ __all__ = [
     'MemoryLearning',          # Memory learning
     'HebbianLearning',         # Hebbian learning
     'EnsembleLearning',        # Ensemble learning
+    'BehaviorFeedbackLearning', # Behavior-level negative feedback
     'Experience',              # Experience sample
 ]
 

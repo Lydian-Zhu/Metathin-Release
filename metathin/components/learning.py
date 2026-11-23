@@ -26,6 +26,17 @@ def safe_float_convert(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def _numeric(value: Any) -> Optional[float]:
+    """Return a finite float, or None for non-numeric labels/objects."""
+    try:
+        out = float(value)
+    except (TypeError, ValueError):
+        return None
+    if np.isnan(out) or np.isinf(out):
+        return None
+    return out
+
+
 def safe_array_convert(data: Any, default_dim: int = 1) -> np.ndarray:
     if data is None:
         return np.zeros(default_dim, dtype=np.float64)
@@ -106,51 +117,59 @@ class GradientLearning(LearningMechanism):
     
     def compute_adjustment(self, expected, actual, context):
         try:
+            exp_val = _numeric(expected)
+            act_val = _numeric(actual)
+            if exp_val is None or act_val is None:
+                self._logger.warning(
+                    "GradientLearning requires numeric feedback; got expected=%r actual=%r",
+                    expected, actual,
+                )
+                return None
+
             self._step += 1
             params = context.get('parameters', {})
-            features = context.get('features')
-            features = safe_array_convert(features, default_dim=1)
-            
+            features = safe_array_convert(context.get('features'), default_dim=1)
             if not params:
                 return None
-            
-            exp_val = safe_float_convert(expected)
-            act_val = safe_float_convert(actual)
+
             error = exp_val - act_val
-            
             loss = error ** 2
             self.loss_history.append(loss)
             if len(self.loss_history) > 1000:
                 self.loss_history = self.loss_history[-1000:]
-            
+
             lr = context.get('learning_rate', self.current_lr)
             adjustments = {}
-            
-            for i, (key, value) in enumerate(params.items()):
+            for key in params:
                 if key.startswith('w_'):
-                    feat_idx = i % len(features)
-                    # 直接计算 delta = -2 * lr * error * feature
-                    delta = -2 * lr * error * features[feat_idx]
-                    
-                    if abs(delta) > self.clip_norm:
-                        delta = self.clip_norm if delta > 0 else -self.clip_norm
-                    
-                    if self.momentum > 0:
-                        if key in self.velocity:
-                            delta = self.momentum * self.velocity[key] + (1 - self.momentum) * delta
-                        self.velocity[key] = delta
-                    if not np.isnan(delta) and not np.isinf(delta):
-                        adjustments[key] = delta
-            
+                    parts = key.split('_')
+                    try:
+                        feat_idx = int(parts[2])
+                    except (IndexError, ValueError):
+                        feat_idx = 0
+                    feat = features[feat_idx] if feat_idx < len(features) else 0.0
+                    delta = -2 * lr * error * feat
+                elif key.startswith('b_'):
+                    delta = -2 * lr * error
+                else:
+                    continue
+
+                if abs(delta) > self.clip_norm:
+                    delta = self.clip_norm if delta > 0 else -self.clip_norm
+                if self.momentum > 0:
+                    if key in self.velocity:
+                        delta = self.momentum * self.velocity[key] + (1 - self.momentum) * delta
+                    self.velocity[key] = delta
+                if not np.isnan(delta) and not np.isinf(delta):
+                    adjustments[key] = delta
+
             if self.decay < 1.0:
                 self.current_lr = self.base_lr * (self.decay ** self._step)
-            
             return adjustments if adjustments else None
-            
         except Exception as e:
             self._logger.error(f"Gradient computation failed: {e}")
             return None
-    
+
     def get_loss_stats(self):
         if not self.loss_history:
             return {}
@@ -187,40 +206,49 @@ class RewardLearning(LearningMechanism):
     
     def compute_adjustment(self, expected, actual, context):
         try:
-            reward = context.get('reward', 0.0)
-            reward = safe_float_convert(reward)
-            
+            reward = _numeric(context.get('reward'))
+            if reward is None:
+                self._logger.warning("RewardLearning requires a numeric reward in context['reward']")
+                return None
+
+            # Compute advantage against the *previous* average, then update stats.
+            if self.use_advantage:
+                advantage = reward - self.cumulative_reward if self.reward_count else reward - self.baseline
+            else:
+                advantage = reward - self.baseline
+
             self.reward_history.append(reward)
             if len(self.reward_history) > 1000:
                 self.reward_history = self.reward_history[-1000:]
-            
             self.cumulative_reward = (self.cumulative_reward * self.reward_count + reward)
             self.reward_count += 1
-            if self.reward_count > 0:
-                self.cumulative_reward /= self.reward_count
-            
+            self.cumulative_reward /= self.reward_count
+
             params = context.get('parameters', {})
             if not params:
                 return None
-            
+
             features = context.get('features')
             features = safe_array_convert(features, default_dim=1)
             
-            if self.use_advantage:
-                advantage = reward - self.cumulative_reward
-            else:
-                advantage = reward - self.baseline
-            
             adjustments = {}
-            # 使用 reward 而不是 advantage（测试期望直接使用 reward）
-            effective_reward = reward if not self.use_advantage else advantage
-            for i, (key, value) in enumerate(params.items()):
+            effective_reward = advantage
+            for key in params:
                 if key.startswith('w_'):
-                    feat_idx = i % len(features)
-                    delta = self.learning_rate * effective_reward * features[feat_idx]
-                    if not np.isnan(delta) and not np.isinf(delta):
-                        adjustments[key] = delta
-            
+                    parts = key.split('_')
+                    try:
+                        feat_idx = int(parts[2])
+                    except (IndexError, ValueError):
+                        feat_idx = 0
+                    feat = features[feat_idx] if feat_idx < len(features) else 0.0
+                    delta = self.learning_rate * effective_reward * feat
+                elif key.startswith('b_'):
+                    delta = self.learning_rate * effective_reward
+                else:
+                    continue
+                if not np.isnan(delta) and not np.isinf(delta):
+                    adjustments[key] = delta
+
             return adjustments if adjustments else None
             
         except Exception as e:
@@ -260,6 +288,18 @@ class MemoryLearning(LearningMechanism):
     def remember(self, experience: Experience) -> None:
         if experience is not None:
             self.memory.append(experience)
+
+    def record_experience(self, features, behavior, expected=None, actual=None,
+                          reward: float = 0.0, metadata=None) -> None:
+        """Pipeline hook: persist the current thought as an Experience."""
+        self.remember(Experience(
+            features=np.asarray(features, dtype=np.float64).flatten(),
+            behavior=str(behavior),
+            expected=expected,
+            actual=actual,
+            reward=float(reward or 0.0),
+            metadata=metadata or {},
+        ))
     
     def compute_adjustment(self, expected, actual, context):
         try:
@@ -310,10 +350,15 @@ class MemoryLearning(LearningMechanism):
                 return None
             
             adjustments = {}
-            for i, (key, value) in enumerate(params.items()):
+            for key in params:
                 if key.startswith('w_'):
-                    feat_idx = i % len(features)
-                    delta = self.learning_rate * avg_error * features[feat_idx]
+                    parts = key.split('_')
+                    try:
+                        feat_idx = int(parts[2])
+                    except (IndexError, ValueError):
+                        feat_idx = 0
+                    feat = features[feat_idx] if feat_idx < len(features) else 0.0
+                    delta = self.learning_rate * avg_error * feat
                     if not np.isnan(delta) and not np.isinf(delta):
                         adjustments[key] = delta
             
@@ -393,20 +438,33 @@ class HebbianLearning(LearningMechanism):
                 return None
             
             features = safe_array_convert(features, default_dim=1)
-            act_val = safe_float_convert(actual)
+            act_val = _numeric(actual)
+            if act_val is None:
+                self._logger.warning("HebbianLearning requires numeric actual output")
+                return None
             post = self._activation(act_val)
-            
+
             adjustments = {}
-            for i, (key, value) in enumerate(params.items()):
+            for key in params:
                 if key.startswith('w_'):
-                    feat_idx = i % len(features)
-                    pre = self._activation(features[feat_idx])
+                    parts = key.split('_')
+                    try:
+                        feat_idx = int(parts[2])
+                    except (IndexError, ValueError):
+                        feat_idx = 0
+                    feat = features[feat_idx] if feat_idx < len(features) else 0.0
+                    pre = self._activation(feat)
+                    delta = self.learning_rate * pre * post
                     if self.use_anti:
-                        delta = -self.learning_rate * pre * post
-                    else:
-                        delta = self.learning_rate * pre * post
-                    if not np.isnan(delta) and not np.isinf(delta):
-                        adjustments[key] = delta
+                        delta = -delta
+                elif key.startswith('b_'):
+                    delta = self.learning_rate * post
+                    if self.use_anti:
+                        delta = -delta
+                else:
+                    continue
+                if not np.isnan(delta) and not np.isinf(delta):
+                    adjustments[key] = delta
             
             return adjustments if adjustments else None
             
@@ -512,6 +570,107 @@ class EnsembleLearning(LearningMechanism):
 
 
 # ============================================================
+# 6. Behavior Feedback Learning (negative feedback)
+# ============================================================
+
+class BehaviorFeedbackLearning(LearningMechanism):
+    """Behavior-level negative feedback.
+
+    与 GradientLearning 的“输出回归”不同，这里只惩罚/奖励本次被执行的
+    行为：选错时压低该行为的适应度权重；选对时默认不更新（pure negative
+    feedback），可通过 ``positive_feedback`` 加一点正向强化。selector
+    权重决定“选谁”，因此反馈方向与决策语义一致。
+
+    对分类任务：
+        feedback = positive_feedback (actual == expected) / -1 (actual != expected)
+    对无标签任务：
+        feedback = context['reward']（裁剪到 [-1, 1]）
+
+    只更新被选中行为的权重行，不做 bias 更新（bias 容易把不同行为一起抬高）。
+    """
+
+    def __init__(self, learning_rate: float = 0.01, normalize_features: bool = True,
+                 max_step: float = 0.05, bias_scale: float = 0.0,
+                 positive_feedback: float = 0.0, numeric_tolerance: float = 1e-6):
+        super().__init__()
+        self.learning_rate = learning_rate
+        self.normalize_features = normalize_features
+        self.max_step = max_step
+        self.bias_scale = bias_scale
+        self.positive_feedback = positive_feedback
+        self.numeric_tolerance = numeric_tolerance
+        self.feedback_history: List[float] = []
+        self._scales: List[float] = []
+        self._logger = logging.getLogger("metathin.learning.BehaviorFeedbackLearning")
+
+    def compute_adjustment(self, expected, actual, context):
+        try:
+            behavior_index = context.get('behavior_index')
+            if behavior_index is None:
+                self._logger.warning(
+                    "BehaviorFeedbackLearning requires context['behavior_index']"
+                )
+                return None
+
+            if expected is not None:
+                exp_num = _numeric(expected)
+                act_num = _numeric(actual)
+                if exp_num is not None and act_num is not None:
+                    # Numeric target: graded negative feedback by relative error.
+                    rel_error = abs(exp_num - act_num) / max(abs(exp_num), 1.0)
+                    correct = rel_error <= self.numeric_tolerance
+                    feedback = self.positive_feedback if correct else -min(1.0, rel_error)
+                else:
+                    correct = expected == actual
+                    feedback = self.positive_feedback if correct else -1.0
+            else:
+                reward = _numeric(context.get('reward'))
+                if reward is None:
+                    return None
+                feedback = max(-1.0, min(1.0, reward))
+
+            features = safe_array_convert(context.get('features'), default_dim=1)
+            if self.normalize_features:
+                if len(self._scales) < len(features):
+                    self._scales.extend([1.0] * (len(features) - len(self._scales)))
+                for j, value in enumerate(features):
+                    self._scales[j] = max(self._scales[j], abs(float(value)), 1.0)
+                features = features / np.asarray(self._scales[:len(features)], dtype=np.float64)
+
+            self.feedback_history.append(feedback)
+            if len(self.feedback_history) > 1000:
+                self.feedback_history = self.feedback_history[-1000:]
+
+            idx = int(behavior_index)
+            adjustments = {}
+            for j, feat in enumerate(features):
+                delta = self.learning_rate * feedback * float(feat)
+                if abs(delta) > self.max_step:
+                    delta = self.max_step if delta > 0 else -self.max_step
+                adjustments[f'w_{idx}_{j}'] = delta
+
+            if self.bias_scale:
+                adjustments[f'b_{idx}'] = self.learning_rate * feedback * self.bias_scale
+
+            return adjustments if adjustments else None
+        except Exception as e:
+            self._logger.error(f"Behavior feedback failed: {e}")
+            return None
+
+    def get_stats(self):
+        if not self.feedback_history:
+            return super().get_stats()
+        recent = self.feedback_history[-100:]
+        return {
+            'name': self.__class__.__name__,
+            'type': 'learning_mechanism',
+            'updates': len(self.feedback_history),
+            'positive_rate': sum(1 for f in recent if f > 0) / len(recent),
+            'avg_feedback': float(np.mean(recent)),
+        }
+
+
+# ============================================================
 # Export
 # ============================================================
 
@@ -521,5 +680,6 @@ __all__ = [
     'MemoryLearning',
     'HebbianLearning',
     'EnsembleLearning',
+    'BehaviorFeedbackLearning',
     'Experience',
 ]

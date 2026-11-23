@@ -55,7 +55,7 @@ from ..config import MetathinConfig, load_config
 from ..components.pattern_space import SimplePatternSpace
 from ..components.selector import SimpleSelector
 from ..components.decision import MaxFitnessStrategy
-from ..components.learning import GradientLearning
+from ..components.learning import BehaviorFeedbackLearning
 
 
 # ============================================================
@@ -162,7 +162,7 @@ class Metathin:
         # Ψ - Learning Mechanism | 学习机制
         self.Ψ: Optional[LearningMechanism] = learning_mechanism
         if learning_mechanism is None and self._config.pipeline.enable_learning:
-            self.Ψ = GradientLearning(learning_rate=self._config.pipeline.learning_rate)
+            self.Ψ = BehaviorFeedbackLearning(learning_rate=self._config.pipeline.learning_rate)
         
         # ============================================================
         # Services (Lazy Initialization) | 服务（延迟初始化）

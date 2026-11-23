@@ -21,8 +21,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   freezes the clock for that case so the 30-second boundary cannot race.
 - `metathin_plus.sci` no longer prints on import and reports version `0.4.0`,
   the same release version as the core package.
+- History tracking now records every thought: empty `HistoryTracker` no longer
+  evaluates as `False`, and the agent uses the existing `record(context)` API.
+- Learning now defaults to `BehaviorFeedbackLearning`, a behavior-level negative
+  feedback rule: a wrong execution lowers the selected behavior's fitness
+  weights, instead of regressing selector weights against the final output.
+  `GradientLearning` remains available and now also updates bias terms.
 
 ### Changed
+
+- `BehaviorFeedbackLearning` is exported from `metathin` and
+  `metathin.components`; it is the default when `enable_learning=True` and no
+  explicit mechanism is supplied.
+- Learning context now carries `behavior_index` and `reward`, and the pipeline
+  applies `post_update` hooks (Hebbian normalization) and records experiences
+  for `MemoryLearning`.
 
 - Added `pyproject.toml` (PEP 517/518 build) and `.gitignore`.
 - Added PEP 561 `py.typed` markers referenced by `setup.py` package data.
