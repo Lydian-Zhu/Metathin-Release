@@ -44,6 +44,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   update: each feature column is centered across behaviors, so one behavior's
   penalty raises the others' relative scores instead of letting all rows drift
   negative together. Disable with `normalize_weights=False`.
+- `BehaviorFeedbackLearning` now performs counterfactual credit assignment:
+  when the expected behavior is known and differs from the executed one, the
+  expected behavior's row receives a positive update. Disable with
+  `counterfactual=False`; scale with `counterfactual_feedback`.
+- Selectors expose `get_learning_features()` and `parameter_prefix`, so
+  learning mechanisms can update `SimpleSelector` (`w_`) and
+  `PolynomialSelector` (`poly_w_`) with correctly shaped features and keys.
 
 - Added `pyproject.toml` (PEP 517/518 build) and `.gitignore`.
 - Added PEP 561 `py.typed` markers referenced by `setup.py` package data.

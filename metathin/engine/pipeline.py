@@ -485,19 +485,31 @@ class ThinkingPipeline:
 
         # Build context for learning | 构建学习上下文
         behavior_index = None
+        expected_behavior_index = None
         mapping = getattr(selector, '_behavior_indices', None)
         if isinstance(mapping, dict):
             behavior_index = mapping.get(behavior_name)
+            if expected is not None:
+                expected_behavior_index = mapping.get(expected)
+                if expected_behavior_index is None:
+                    expected_behavior_index = mapping.get(str(expected))
 
         context = {
             'features': features,
+            'raw_features': features,
             'behavior_name': behavior_name,
             'behavior_index': behavior_index,
+            'expected_behavior_index': expected_behavior_index,
+            'parameter_prefix': getattr(selector, 'parameter_prefix', 'w_'),
             'parameters': selector.get_parameters(),
             'expected': expected,
             'actual': actual,
             'reward': reward,
         }
+
+        get_learning_features = getattr(selector, 'get_learning_features', None)
+        if callable(get_learning_features):
+            context['features'] = get_learning_features(features)
 
         # Compute adjustment | 计算调整量
         adjustment = learning_mechanism.compute_adjustment(expected, actual, context)

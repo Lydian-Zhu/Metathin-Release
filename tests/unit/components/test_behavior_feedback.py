@@ -114,6 +114,65 @@ class TestBehaviorFeedbackLearning:
 
         assert learner.post_update(params) == {"w_0_0": 1.0, "w_1_0": 3.0}
 
+    def test_counterfactual_rewards_expected_behavior(self):
+        learner = BehaviorFeedbackLearning(
+            learning_rate=0.1, counterfactual_feedback=1.0,
+        )
+        context = {
+            "behavior_index": 1,
+            "expected_behavior_index": 0,
+            "features": np.array([1.0, 1.0]),
+            "parameters": {
+                "w_0_0": 0.0, "w_0_1": 0.0,
+                "w_1_0": 0.0, "w_1_1": 0.0,
+            },
+        }
+
+        adjustment = learner.compute_adjustment("monitor", "inspect", context)
+
+        assert adjustment["w_1_0"] < 0
+        assert adjustment["w_0_0"] > 0
+        assert adjustment["w_0_0"] == pytest.approx(-adjustment["w_1_0"])
+
+    def test_counterfactual_can_be_disabled(self):
+        learner = BehaviorFeedbackLearning(learning_rate=0.1, counterfactual=False)
+        context = {
+            "behavior_index": 1,
+            "expected_behavior_index": 0,
+            "features": np.array([1.0]),
+            "parameters": {"w_0_0": 0.0, "w_1_0": 0.0},
+        }
+
+        adjustment = learner.compute_adjustment("monitor", "inspect", context)
+
+        assert "w_0_0" not in adjustment
+        assert adjustment["w_1_0"] < 0
+
+    def test_counterfactual_uses_selector_parameter_prefix(self):
+        learner = BehaviorFeedbackLearning(learning_rate=0.1)
+        context = {
+            "behavior_index": 1,
+            "expected_behavior_index": 0,
+            "parameter_prefix": "poly_w_",
+            "features": np.array([1.0]),
+            "parameters": {"poly_w_0_0": 0.0, "poly_w_1_0": 0.0},
+        }
+
+        adjustment = learner.compute_adjustment("monitor", "inspect", context)
+
+        assert "poly_w_0_0" in adjustment
+        assert "poly_w_1_0" in adjustment
+        assert "w_0_0" not in adjustment
+
+    def test_competitive_normalization_handles_polynomial_keys(self):
+        learner = BehaviorFeedbackLearning()
+        params = {"poly_w_0_0": 1.0, "poly_w_1_0": 3.0}
+
+        updated = learner.post_update(params)
+
+        assert updated["poly_w_0_0"] == pytest.approx(-1.0)
+        assert updated["poly_w_1_0"] == pytest.approx(1.0)
+
     def test_classification_learning_improves_accuracy(self):
         np.random.seed(42)
         space = SimplePatternSpace(lambda s: [s["vib"], 1.0])

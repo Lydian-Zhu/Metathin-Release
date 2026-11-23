@@ -588,6 +588,8 @@ class BehaviorFeedbackLearning(LearningMechanism):
         feedback = context['reward']（裁剪到 [-1, 1]）
 
     只更新被选中行为的权重行，不做 bias 更新（bias 容易把不同行为一起抬高）。
+    若已知 ``expected_behavior_index`` 且与本次执行不同，还会给正确行为
+    一行反事实正向更新，避免纯负反馈永远学不到“应该选谁”。
     每次更新后可做竞争性归一化：按特征列减去行为间均值，避免所有行为
     权重一起漂负；它约束的是相对优势，不等于 L2 单位化。
 
@@ -601,7 +603,8 @@ class BehaviorFeedbackLearning(LearningMechanism):
                  positive_feedback: float = 0.0, numeric_tolerance: float = 1e-6,
                  exploration_rate: float = 0.2, exploration_decay: float = 0.99,
                  min_exploration: float = 0.01, exploration_margin: float = 0.1,
-                 normalize_weights: bool = True):
+                 normalize_weights: bool = True, counterfactual: bool = True,
+                 counterfactual_feedback: float = 0.5):
         super().__init__()
         if not 0.0 <= exploration_rate <= 1.0:
             raise ValueError(f"exploration_rate must be in [0,1], got {exploration_rate}")
@@ -611,6 +614,10 @@ class BehaviorFeedbackLearning(LearningMechanism):
             raise ValueError(f"min_exploration must be in [0,1], got {min_exploration}")
         if exploration_margin < 0.0:
             raise ValueError(f"exploration_margin must be >= 0, got {exploration_margin}")
+        if counterfactual_feedback < 0.0:
+            raise ValueError(
+                f"counterfactual_feedback must be >= 0, got {counterfactual_feedback}"
+            )
         self.learning_rate = learning_rate
         self.normalize_features = normalize_features
         self.max_step = max_step
@@ -622,6 +629,8 @@ class BehaviorFeedbackLearning(LearningMechanism):
         self.min_exploration = min_exploration
         self.exploration_margin = exploration_margin
         self.normalize_weights = normalize_weights
+        self.counterfactual = counterfactual
+        self.counterfactual_feedback = counterfactual_feedback
         self._exploration_step = 0
         self._exploration_count = 0
         self.feedback_history: List[float] = []
@@ -671,15 +680,17 @@ class BehaviorFeedbackLearning(LearningMechanism):
         if not self.normalize_weights:
             return params
 
+        prefix = 'poly_w_' if any(k.startswith('poly_w_') for k in params) else 'w_'
         rows: Dict[int, Dict[int, float]] = {}
         for key, value in params.items():
-            if not key.startswith('w_'):
+            if not key.startswith(prefix):
                 continue
             parts = key.split('_')
-            if len(parts) != 3:
+            offset = 2 if prefix == 'poly_w_' else 1
+            if len(parts) != offset + 2:
                 continue
             try:
-                i, j = int(parts[1]), int(parts[2])
+                i, j = int(parts[offset]), int(parts[offset + 1])
             except ValueError:
                 continue
             rows.setdefault(i, {})[j] = float(value)
@@ -695,7 +706,7 @@ class BehaviorFeedbackLearning(LearningMechanism):
             mean = sum(values) / len(values)
             for i, row in rows.items():
                 if j in row:
-                    params[f'w_{i}_{j}'] = row[j] - mean
+                    params[f'{prefix}{i}_{j}'] = row[j] - mean
         return params
 
     def compute_adjustment(self, expected, actual, context):
@@ -736,13 +747,31 @@ class BehaviorFeedbackLearning(LearningMechanism):
             if len(self.feedback_history) > 1000:
                 self.feedback_history = self.feedback_history[-1000:]
 
+            prefix = context.get('parameter_prefix', 'w_')
             idx = int(behavior_index)
+            expected_index = context.get('expected_behavior_index')
+            if expected_index is not None:
+                try:
+                    expected_index = int(expected_index)
+                except (TypeError, ValueError):
+                    expected_index = None
+
             adjustments = {}
             for j, feat in enumerate(features):
                 delta = self.learning_rate * feedback * float(feat)
                 if abs(delta) > self.max_step:
                     delta = self.max_step if delta > 0 else -self.max_step
-                adjustments[f'w_{idx}_{j}'] = delta
+                adjustments[f'{prefix}{idx}_{j}'] = delta
+
+                if (
+                    self.counterfactual
+                    and expected_index is not None
+                    and expected_index != idx
+                ):
+                    pos_delta = self.learning_rate * self.counterfactual_feedback * float(feat)
+                    if abs(pos_delta) > self.max_step:
+                        pos_delta = self.max_step if pos_delta > 0 else -self.max_step
+                    adjustments[f'{prefix}{expected_index}_{j}'] = pos_delta
 
             if self.bias_scale:
                 adjustments[f'b_{idx}'] = self.learning_rate * feedback * self.bias_scale

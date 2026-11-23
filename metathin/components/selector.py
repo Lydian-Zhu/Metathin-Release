@@ -153,6 +153,7 @@ class SimpleSelector(Selector):
             ValueError: If parameters are out of valid range | 如果参数超出有效范围
         """
         super().__init__()
+        self.parameter_prefix = 'w_'
         
         if temperature <= 0:
             raise ValueError(f"temperature must be > 0, got {temperature}")
@@ -286,6 +287,12 @@ class SimpleSelector(Selector):
             self._logger.error(f"Fitness computation failed: {e}")
             raise FitnessComputationError(f"Fitness computation failed: {e}") from e
     
+    def get_learning_features(self, features: FeatureVector) -> np.ndarray:
+        """Features aligned with this selector's weight columns."""
+        if not isinstance(features, np.ndarray):
+            features = np.array(features, dtype=np.float64)
+        return features.flatten()
+
     def get_parameters(self) -> ParameterDict:
         """Get current learnable parameters | 获取当前可学习参数"""
         params = {}
@@ -403,6 +410,7 @@ class PolynomialSelector(Selector):
             ValueError: If degree is out of valid range | 如果次数超出有效范围
         """
         super().__init__()
+        self.parameter_prefix = 'poly_w_'
         
         if degree < 1 or degree > 3:
             raise ValueError(f"degree must be between 1 and 3, got {degree}")
@@ -564,7 +572,15 @@ class PolynomialSelector(Selector):
             expanded.append(1.0)
         
         return np.array(expanded, dtype=np.float64)
-    
+
+    def get_learning_features(self, features: FeatureVector) -> np.ndarray:
+        """Expanded polynomial features aligned with weight columns."""
+        if not isinstance(features, np.ndarray):
+            features = np.array(features, dtype=np.float64)
+        features = features.flatten()
+        features = self._normalize_features(features, update_stats=False)
+        return self._expand_features(features)
+
     def _get_or_create_index(self, behavior_name: str) -> int:
         """Get or create behavior index | 获取或创建行为索引"""
         if behavior_name in self._behavior_indices:
