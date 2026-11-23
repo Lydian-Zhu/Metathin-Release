@@ -14,6 +14,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   scientific discovery module.
 - `requirements.txt` is now a valid requirements file (previously it contained
   Markdown prose and a fenced code block, so `pip install -r` failed).
+- Python 3.8 is supported again: `from __future__ import annotations` in
+  `metathin/engine/pipeline.py` and `engine/hooks.py` makes the PEP 585
+  annotations lazy (verified on CPython 3.8.20).
 - `TestMemoryLearning::test_prune` is deterministic again: a test-local fixture
   freezes the clock for that case so the 30-second boundary cannot race.
 - `metathin_plus.sci` no longer prints on import and reports version `0.4.0`,
@@ -23,14 +26,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Added `pyproject.toml` (PEP 517/518 build) and `.gitignore`.
 - Added PEP 561 `py.typed` markers referenced by `setup.py` package data.
-- Added a CI workflow: pytest on Python 3.9-3.12 plus a wheel packaging check.
+- Added a CI workflow: pytest on Python 3.8-3.12 plus a wheel packaging check.
 - Removed the unused legacy module `metathin_plus/sci/memory/pretrained.py`
   (duplicated by the `pretrained/` package) and a committed `.pyc` file.
 
 ### Known issues
 
-- Python 3.8 is still advertised in `setup.py`/README but PEP 585 annotations in
-  `metathin/engine/pipeline.py` and `metathin/engine/hooks.py` fail at import
-  time on 3.8. Either drop 3.8 or add `from __future__ import annotations`.
 - `metathin_plus.sci` has no dedicated test suite yet.
 - `User Manual(Now it is empty).md` is still an empty placeholder.

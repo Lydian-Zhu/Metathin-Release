@@ -9,14 +9,21 @@ on:
 jobs:
   test:
     name: pytest (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        # Python 3.8 is not included yet: PEP 585 annotations in
-        # metathin/engine/{pipeline,hooks}.py fail at import time there.
-        # Tracked as a follow-up in CHANGELOG.md.
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        include:
+          - python-version: "3.8"
+            os: ubuntu-22.04
+          - python-version: "3.9"
+            os: ubuntu-latest
+          - python-version: "3.10"
+            os: ubuntu-latest
+          - python-version: "3.11"
+            os: ubuntu-latest
+          - python-version: "3.12"
+            os: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
