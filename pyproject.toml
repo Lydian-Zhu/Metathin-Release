@@ -1,0 +1,7 @@
+# Build configuration
+# Package metadata lives in setup.py; this file enables PEP 517/518 builds
+# (`pip install .`, `python -m build`) without legacy fallbacks.
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
