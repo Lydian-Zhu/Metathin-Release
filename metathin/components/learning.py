@@ -3,6 +3,7 @@ Learning Mechanism Components | 学习机制组件
 =============================================
 """
 
+import random
 import time
 import numpy as np
 from typing import List, Dict, Any, Optional, Tuple, Union
@@ -587,21 +588,74 @@ class BehaviorFeedbackLearning(LearningMechanism):
         feedback = context['reward']（裁剪到 [-1, 1]）
 
     只更新被选中行为的权重行，不做 bias 更新（bias 容易把不同行为一起抬高）。
+
+    训练阶段可按 ``exploration_rate`` 做 ε-greedy 概率探索；若 top-1/top-2
+    适应度差已超过 ``exploration_margin``，则视为足够自信、不注入噪声。
+    推理（未传 expected）不探索，保持确定性。
     """
 
     def __init__(self, learning_rate: float = 0.01, normalize_features: bool = True,
                  max_step: float = 0.05, bias_scale: float = 0.0,
-                 positive_feedback: float = 0.0, numeric_tolerance: float = 1e-6):
+                 positive_feedback: float = 0.0, numeric_tolerance: float = 1e-6,
+                 exploration_rate: float = 0.2, exploration_decay: float = 0.99,
+                 min_exploration: float = 0.01, exploration_margin: float = 0.1):
         super().__init__()
+        if not 0.0 <= exploration_rate <= 1.0:
+            raise ValueError(f"exploration_rate must be in [0,1], got {exploration_rate}")
+        if not 0.0 < exploration_decay <= 1.0:
+            raise ValueError(f"exploration_decay must be in (0,1], got {exploration_decay}")
+        if not 0.0 <= min_exploration <= 1.0:
+            raise ValueError(f"min_exploration must be in [0,1], got {min_exploration}")
+        if exploration_margin < 0.0:
+            raise ValueError(f"exploration_margin must be >= 0, got {exploration_margin}")
         self.learning_rate = learning_rate
         self.normalize_features = normalize_features
         self.max_step = max_step
         self.bias_scale = bias_scale
         self.positive_feedback = positive_feedback
         self.numeric_tolerance = numeric_tolerance
+        self.exploration_rate = exploration_rate
+        self.exploration_decay = exploration_decay
+        self.min_exploration = min_exploration
+        self.exploration_margin = exploration_margin
+        self._exploration_step = 0
+        self._exploration_count = 0
         self.feedback_history: List[float] = []
         self._scales: List[float] = []
         self._logger = logging.getLogger("metathin.learning.BehaviorFeedbackLearning")
+
+    def should_explore(self, fitness_scores: Optional[List[float]] = None) -> bool:
+        """Sample an epsilon-greedy exploration decision, then decay epsilon.
+
+        If ``exploration_margin`` is positive and the top-1/top-2 fitness gap
+        already exceeds it, the decision is confident enough and no noise is
+        injected. This keeps confident predictions stable while exploring
+        ambiguous regions.
+        """
+        if self.exploration_rate <= 0.0:
+            return False
+
+        explore = True
+        if fitness_scores is not None and len(fitness_scores) >= 2 and self.exploration_margin > 0.0:
+            top = sorted((float(v) for v in fitness_scores), reverse=True)
+            margin = top[0] - top[1]
+            if margin >= self.exploration_margin:
+                explore = False
+
+        if explore:
+            explore = random.random() < self.exploration_rate
+            if explore:
+                self._exploration_count += 1
+
+        self._exploration_step += 1
+        self.exploration_rate = max(
+            self.min_exploration, self.exploration_rate * self.exploration_decay
+        )
+        return explore
+
+    def get_exploration_rate(self) -> float:
+        """Current exploration probability | 当前探索概率"""
+        return self.exploration_rate
 
     def compute_adjustment(self, expected, actual, context):
         try:
@@ -667,6 +721,8 @@ class BehaviorFeedbackLearning(LearningMechanism):
             'updates': len(self.feedback_history),
             'positive_rate': sum(1 for f in recent if f > 0) / len(recent),
             'avg_feedback': float(np.mean(recent)),
+            'exploration_rate': self.exploration_rate,
+            'exploration_count': self._exploration_count,
         }
 
 

@@ -27,6 +27,7 @@ Design Philosophy | 设计理念:
 
 from __future__ import annotations
 
+import random
 import time
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
@@ -258,14 +259,32 @@ class ThinkingPipeline:
         # ============================================================
         try:
             decide_start = time.time()
-            selected = decision_strategy.select(
-                candidates,
-                [fitness_scores[b.name] for b in candidates],
-                features
-            )
-            confidence = decision_strategy.get_confidence(
-                [fitness_scores[b.name] for b in candidates]
-            )
+            explore = False
+            exploration_rate = 0.0
+            if (
+                expected is not None
+                and self.enable_learning
+                and learning_mechanism is not None
+                and hasattr(learning_mechanism, 'should_explore')
+            ):
+                explore = learning_mechanism.should_explore(
+                    [fitness_scores[b.name] for b in candidates]
+                )
+                exploration_rate = learning_mechanism.get_exploration_rate()
+
+            if explore:
+                # Probabilistic exploration: bypass the greedy strategy.
+                selected = random.choice(candidates)
+                confidence = 1.0 - exploration_rate
+            else:
+                selected = decision_strategy.select(
+                    candidates,
+                    [fitness_scores[b.name] for b in candidates],
+                    features
+                )
+                confidence = decision_strategy.get_confidence(
+                    [fitness_scores[b.name] for b in candidates]
+                )
             decide_duration = time.time() - decide_start
             context = context.with_stage_time('decide', decide_duration)
 

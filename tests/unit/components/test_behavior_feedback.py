@@ -69,6 +69,29 @@ class TestBehaviorFeedbackLearning:
         assert adjustment["w_0_0"] == pytest.approx(-0.01)
         assert learner.feedback_history[-1] == pytest.approx(-0.1)
 
+    def test_exploration_samples_and_decays(self, monkeypatch):
+        learner = BehaviorFeedbackLearning(
+            exploration_rate=0.5, exploration_decay=0.5, min_exploration=0.01,
+        )
+        monkeypatch.setattr("metathin.components.learning.random.random", lambda: 0.1)
+
+        assert learner.should_explore() is True
+        assert learner.get_exploration_rate() == pytest.approx(0.25)
+
+    def test_exploration_is_skipped_when_confident(self, monkeypatch):
+        learner = BehaviorFeedbackLearning(
+            exploration_rate=1.0, exploration_margin=0.1,
+        )
+        monkeypatch.setattr("metathin.components.learning.random.random", lambda: 0.0)
+
+        assert learner.should_explore([0.9, 0.2]) is False
+        assert learner.should_explore([0.6, 0.58]) is True
+
+    def test_zero_exploration_never_samples(self):
+        learner = BehaviorFeedbackLearning(exploration_rate=0.0)
+
+        assert learner.should_explore([0.5, 0.5]) is False
+
     def test_classification_learning_improves_accuracy(self):
         np.random.seed(42)
         space = SimplePatternSpace(lambda s: [s["vib"], 1.0])
