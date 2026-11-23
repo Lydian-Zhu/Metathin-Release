@@ -270,7 +270,9 @@ class ThinkingPipeline:
                 explore = learning_mechanism.should_explore(
                     [fitness_scores[b.name] for b in candidates]
                 )
-                exploration_rate = learning_mechanism.get_exploration_rate()
+                exploration_rate = getattr(
+                    learning_mechanism, 'get_exploration_rate', lambda: 0.0
+                )()
 
             if explore:
                 # Probabilistic exploration: bypass the greedy strategy.
