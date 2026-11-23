@@ -5,10 +5,10 @@ Metathin+Sci - 科学发现智能体 | Scientific Discovery Agent
 
 基于 Metathin 五元组架构的科学发现模块，用于从数据中发现符号规律。
 
-版本: 0.5.0 (重构版)
+版本: 0.4.0 (与核心包保持同一发布版本)
 """
 
-__version__ = '0.5.0'
+__version__ = '0.4.0'
 __author__ = 'Lydian-Zhu'
 __license__ = 'MIT'
 
@@ -82,9 +82,5 @@ __all__ = [
     'DiscoveryPhase',
 ]
 
-# ============================================================
-# 初始化信息 | Initialization Message
-# ============================================================
-
-print(f"✅ Metathin+Sci v{__version__} loaded | 已加载")
-print(f"   Scientific discovery agent ready | 科学发现智能体就绪")
+# Libraries must stay quiet on import; use logging in the caller instead.
+# 库在导入时不应输出信息，日志交由调用方处理。
