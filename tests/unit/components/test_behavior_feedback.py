@@ -92,6 +92,28 @@ class TestBehaviorFeedbackLearning:
 
         assert learner.should_explore([0.5, 0.5]) is False
 
+    def test_competitive_normalization_centers_each_feature(self):
+        learner = BehaviorFeedbackLearning()
+        params = {
+            "w_0_0": 1.0, "w_0_1": 3.0,
+            "w_1_0": -1.0, "w_1_1": 1.0,
+            "b_0": 0.5,
+        }
+
+        updated = learner.post_update(params)
+
+        assert updated["w_0_0"] == pytest.approx(1.0)
+        assert updated["w_0_1"] == pytest.approx(1.0)
+        assert updated["w_1_0"] == pytest.approx(-1.0)
+        assert updated["w_1_1"] == pytest.approx(-1.0)
+        assert updated["b_0"] == 0.5
+
+    def test_competitive_normalization_can_be_disabled(self):
+        learner = BehaviorFeedbackLearning(normalize_weights=False)
+        params = {"w_0_0": 1.0, "w_1_0": 3.0}
+
+        assert learner.post_update(params) == {"w_0_0": 1.0, "w_1_0": 3.0}
+
     def test_classification_learning_improves_accuracy(self):
         np.random.seed(42)
         space = SimplePatternSpace(lambda s: [s["vib"], 1.0])

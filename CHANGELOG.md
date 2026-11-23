@@ -40,6 +40,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (`exploration_rate`, `exploration_decay`, `min_exploration`), with
   `exploration_margin` suppressing noise when the top-2 fitness gap is
   already confident. Exploration never runs at inference (no `expected`).
+- `BehaviorFeedbackLearning` applies competitive normalization after each
+  update: each feature column is centered across behaviors, so one behavior's
+  penalty raises the others' relative scores instead of letting all rows drift
+  negative together. Disable with `normalize_weights=False`.
 
 - Added `pyproject.toml` (PEP 517/518 build) and `.gitignore`.
 - Added PEP 561 `py.typed` markers referenced by `setup.py` package data.

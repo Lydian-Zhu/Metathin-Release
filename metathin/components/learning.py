@@ -588,6 +588,8 @@ class BehaviorFeedbackLearning(LearningMechanism):
         feedback = context['reward']（裁剪到 [-1, 1]）
 
     只更新被选中行为的权重行，不做 bias 更新（bias 容易把不同行为一起抬高）。
+    每次更新后可做竞争性归一化：按特征列减去行为间均值，避免所有行为
+    权重一起漂负；它约束的是相对优势，不等于 L2 单位化。
 
     训练阶段可按 ``exploration_rate`` 做 ε-greedy 概率探索；若 top-1/top-2
     适应度差已超过 ``exploration_margin``，则视为足够自信、不注入噪声。
@@ -598,7 +600,8 @@ class BehaviorFeedbackLearning(LearningMechanism):
                  max_step: float = 0.05, bias_scale: float = 0.0,
                  positive_feedback: float = 0.0, numeric_tolerance: float = 1e-6,
                  exploration_rate: float = 0.2, exploration_decay: float = 0.99,
-                 min_exploration: float = 0.01, exploration_margin: float = 0.1):
+                 min_exploration: float = 0.01, exploration_margin: float = 0.1,
+                 normalize_weights: bool = True):
         super().__init__()
         if not 0.0 <= exploration_rate <= 1.0:
             raise ValueError(f"exploration_rate must be in [0,1], got {exploration_rate}")
@@ -618,6 +621,7 @@ class BehaviorFeedbackLearning(LearningMechanism):
         self.exploration_decay = exploration_decay
         self.min_exploration = min_exploration
         self.exploration_margin = exploration_margin
+        self.normalize_weights = normalize_weights
         self._exploration_step = 0
         self._exploration_count = 0
         self.feedback_history: List[float] = []
@@ -656,6 +660,43 @@ class BehaviorFeedbackLearning(LearningMechanism):
     def get_exploration_rate(self) -> float:
         """Current exploration probability | 当前探索概率"""
         return self.exploration_rate
+
+    def post_update(self, params: ParameterDict) -> ParameterDict:
+        """Competitive normalization: center each feature column across behaviors.
+
+        After a selected behavior is penalized, its weights decrease; subtracting
+        the per-feature mean makes the other behaviors relatively stronger
+        instead of letting every row drift negative together.
+        """
+        if not self.normalize_weights:
+            return params
+
+        rows: Dict[int, Dict[int, float]] = {}
+        for key, value in params.items():
+            if not key.startswith('w_'):
+                continue
+            parts = key.split('_')
+            if len(parts) != 3:
+                continue
+            try:
+                i, j = int(parts[1]), int(parts[2])
+            except ValueError:
+                continue
+            rows.setdefault(i, {})[j] = float(value)
+
+        if len(rows) < 2:
+            return params
+
+        cols = set()
+        for row in rows.values():
+            cols.update(row)
+        for j in sorted(cols):
+            values = [row.get(j, 0.0) for row in rows.values()]
+            mean = sum(values) / len(values)
+            for i, row in rows.items():
+                if j in row:
+                    params[f'w_{i}_{j}'] = row[j] - mean
+        return params
 
     def compute_adjustment(self, expected, actual, context):
         try:
