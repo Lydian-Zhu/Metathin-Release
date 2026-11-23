@@ -25,8 +25,24 @@ Design Philosophy | 设计理念:
 """
 
 from .memory_manager import MemoryManager
-from .history_tracker import HistoryTracker, ThoughtRecord
+from .history_tracker import HistoryTracker as _BaseHistoryTracker, ThoughtRecord
 from .metrics_collector import MetricsCollector, ThoughtMetrics, AggregatedMetrics
+
+
+class HistoryTracker(_BaseHistoryTracker):
+    """HistoryTracker compatibility wrapper.
+
+    空的 HistoryTracker 在布尔判断中会被当成 False，导致 Metathin.think()
+    跳过历史记录；同时 agent 调用的是历史上并不存在的
+    ``record_from_context``。这里补齐这两个兼容点，后续可把调用点改为
+    ``is not None`` 后移除。
+    """
+
+    def __bool__(self) -> bool:
+        return True
+
+    def record_from_context(self, context, thought_id=None):
+        return self.record(context, thought_id)
 
 
 __all__ = [
