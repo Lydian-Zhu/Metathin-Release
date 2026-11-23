@@ -3,7 +3,50 @@
 All notable changes to this project are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## Unreleased
+## 0.5.0 - 2026-11-23
+
+### Breaking
+
+- Removed `metathin.components` entirely. The package now ships interfaces and
+  orchestration only; applications must inject their own P, B, S, D and Ψ.
+- Removed `metathin_plus` and `metathin_plus.sci`, along with the `sci`,
+  `deep`, `viz` and `data` extras.
+- `Metathin` and `MetathinBuilder` now require an explicit `PatternSpace`,
+  `Selector` and `DecisionStrategy`; no default implementations are created.
+- `PipelineConfig.enable_learning` now defaults to `False`. Enabling learning
+  without a `LearningMechanism` raises at construction time.
+- Version bumped to `0.5.0`; package discovery only includes `metathin`.
+
+### Added
+
+- Runtime contract validation in `ThinkingPipeline`:
+  - component interface and behavior-name checks;
+  - feature vector shape/dtype/finite checks;
+  - fitness must be a finite number in `[0, 1]`;
+  - the decision strategy must return a candidate;
+  - selector parameters and learning adjustments must be finite numeric maps,
+    and learning may only update exposed parameter keys.
+- Contract tests covering malformed selectors, foreign decisions, duplicate
+  behavior names, bad parameter maps, unknown adjustment keys and bad
+  `post_update` output.
+
+### Changed
+
+- README and packaging describe an interface-first framework rather than a
+  bundle of built-in algorithms.
+- Tests use local doubles under `tests/helpers.py`; component tests were removed.
+
+### Removed
+
+- `BehaviorFeedbackLearning`, `GradientLearning`, `RewardLearning`,
+  `MemoryLearning`, `HebbianLearning`, `EnsembleLearning`.
+- `SimplePatternSpace` and other built-in pattern spaces.
+- `FunctionBehavior` and other built-in behavior wrappers.
+- `SimpleSelector`, `PolynomialSelector` and other built-in selectors.
+- `MaxFitnessStrategy` and other built-in decision strategies.
+- `metathin_plus.sci` and its pretrained function libraries.
+
+## 0.4.0
 
 ### Fixed
 

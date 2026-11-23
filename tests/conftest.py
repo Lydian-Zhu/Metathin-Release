@@ -123,7 +123,7 @@ def mock_decision_strategy():
 @pytest.fixture
 def greet_behavior():
     """Greeting behavior."""
-    from metathin.components import FunctionBehavior
+    from tests.helpers import FunctionBehavior
     return FunctionBehavior(
         name="greet",
         func=lambda f, **k: f"Hello! (input length: {f[0] if len(f) > 0 else 0})"
@@ -133,7 +133,7 @@ def greet_behavior():
 @pytest.fixture
 def echo_behavior():
     """Echo behavior that returns the input."""
-    from metathin.components import FunctionBehavior
+    from tests.helpers import FunctionBehavior
     return FunctionBehavior(
         name="echo",
         func=lambda f, **k: k.get('user_input', f"Features: {f}")
@@ -143,7 +143,7 @@ def echo_behavior():
 @pytest.fixture
 def add_behavior():
     """Addition behavior."""
-    from metathin.components import FunctionBehavior
+    from tests.helpers import FunctionBehavior
     return FunctionBehavior(
         name="add",
         func=lambda f, **k: float(np.sum(f)) if len(f) > 0 else 0.0
@@ -153,7 +153,7 @@ def add_behavior():
 @pytest.fixture
 def multiply_behavior():
     """Multiplication behavior."""
-    from metathin.components import FunctionBehavior
+    from tests.helpers import FunctionBehavior
     return FunctionBehavior(
         name="multiply",
         func=lambda f, **k: float(np.prod(f)) if len(f) > 0 else 0.0
@@ -163,7 +163,7 @@ def multiply_behavior():
 @pytest.fixture
 def failing_behavior():
     """Behavior that always fails."""
-    from metathin.components import FunctionBehavior
+    from tests.helpers import FunctionBehavior
     return FunctionBehavior(
         name="failing",
         func=lambda f, **k: exec("raise ValueError('Intentional failure')")
@@ -174,7 +174,7 @@ def failing_behavior():
 def slow_behavior():
     """Slow behavior that takes time."""
     import time
-    from metathin.components import FunctionBehavior
+    from tests.helpers import FunctionBehavior
     return FunctionBehavior(
         name="slow",
         func=lambda f, **k: time.sleep(0.05) or "done",
@@ -193,11 +193,13 @@ def sample_behaviors(greet_behavior, echo_behavior, add_behavior):
 # ============================================================
 
 @pytest.fixture
-def basic_agent(mock_pattern_space, minimal_config):
+def basic_agent(mock_pattern_space, mock_selector, mock_decision_strategy, minimal_config):
     """Basic agent without behaviors."""
     from metathin.agent import Metathin
     return Metathin(
         pattern_space=mock_pattern_space,
+        selector=mock_selector,
+        decision_strategy=mock_decision_strategy,
         config=minimal_config,
         name="TestAgent"
     )

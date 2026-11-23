@@ -103,13 +103,6 @@ class PatternSpace(ABC, Generic[T]):
         """
         pass
     
-        try:
-            # 实际实现在子类中
-            pass
-        except Exception as e:
-            if not isinstance(e, PatternExtractionError):
-                raise PatternExtractionError(f"Feature extraction failed: {e}") from e
-            raise    
     def get_feature_names(self) -> List[str]:
         """
         Get feature name list (optional implementation).

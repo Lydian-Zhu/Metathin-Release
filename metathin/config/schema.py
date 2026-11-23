@@ -54,7 +54,7 @@ class PipelineConfig:
     min_fitness_threshold: float = 0.0
     """Minimum fitness to consider a behavior (0-1) | 考虑行为的最低适应度 (0-1)"""
     
-    enable_learning: bool = True
+    enable_learning: bool = False
     """Whether learning is enabled | 是否启用学习"""
     
     learning_rate: float = 0.01
@@ -416,7 +416,7 @@ class MetathinConfig:
         return cls(
             pipeline=PipelineConfig(
                 min_fitness_threshold=pipeline_data.get('min_fitness_threshold', 0.0),
-                enable_learning=pipeline_data.get('enable_learning', True),
+                enable_learning=pipeline_data.get('enable_learning', False),
                 learning_rate=pipeline_data.get('learning_rate', 0.01),
                 max_retries=pipeline_data.get('max_retries', 3),
                 raise_on_error=pipeline_data.get('raise_on_error', True),

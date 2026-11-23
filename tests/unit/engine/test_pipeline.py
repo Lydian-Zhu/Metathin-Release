@@ -505,3 +505,83 @@ class TestPipelinePerformance:
         assert elapsed >= 0.01
         # Should have recorded execution time
         assert result.stage_times['execute'] >= 0.01
+
+class TestPipelineContractValidation:
+    """The pipeline should reject malformed component contracts."""
+
+    def _run(self, selector=None, strategy=None, learner=None, behaviors=None, expected=None):
+        pipeline = ThinkingPipeline()
+        return pipeline.run(
+            raw_input="hello",
+            pattern_space=SimplePattern(),
+            behaviors=behaviors or [DummyBehavior("b1")],
+            selector=selector or SimpleSelector(),
+            decision_strategy=strategy or GreedyStrategy(),
+            learning_mechanism=learner,
+            expected=expected,
+        )
+
+    def test_rejects_non_numeric_fitness(self):
+        class BadSelector(SimpleSelector):
+            def compute_fitness(self, behavior, features):
+                return "high"
+
+        result = self._run(selector=BadSelector())
+        assert result.success is False
+        assert "non-numeric" in str(result.error)
+
+    def test_rejects_out_of_range_fitness(self):
+        class BadSelector(SimpleSelector):
+            def compute_fitness(self, behavior, features):
+                return 1.2
+
+        result = self._run(selector=BadSelector())
+        assert result.success is False
+        assert "[0, 1]" in str(result.error)
+
+    def test_rejects_selector_that_returns_a_foreign_behavior(self):
+        class BadStrategy(DecisionStrategy):
+            def select(self, behaviors, fitness_scores, features):
+                return DummyBehavior("foreign")
+
+        result = self._run(strategy=BadStrategy())
+        assert result.success is False
+        assert "candidate" in str(result.error)
+
+    def test_rejects_duplicate_behavior_names(self):
+        result = self._run(behaviors=[DummyBehavior("same"), DummyBehavior("same")])
+        assert result.success is False
+        assert "unique" in str(result.error)
+
+    def test_rejects_non_finite_selector_parameters(self):
+        class BadSelector(SimpleSelector):
+            def get_parameters(self):
+                return {"w_0": float("nan")}
+
+        learner = SimpleLearning()
+        result = self._run(
+            selector=BadSelector(), learner=learner, expected="b1"
+        )
+        assert result.success is True
+        assert "finite" in str(result.context.error)
+
+    def test_rejects_unknown_adjustment_keys(self):
+        class BadLearner(SimpleLearning):
+            def compute_adjustment(self, expected, actual, context):
+                return {"not_a_parameter": 1.0}
+
+        result = self._run(learner=BadLearner(), expected="b1")
+        assert result.success is True
+        assert "unknown" in str(result.context.error)
+
+    def test_rejects_bad_post_update_result(self):
+        class BadLearner(SimpleLearning):
+            def compute_adjustment(self, expected, actual, context):
+                return None
+
+            def post_update(self, parameters):
+                return {"w_0": float("inf")}
+
+        result = self._run(learner=BadLearner(), expected="b1")
+        assert result.success is True
+        assert "finite" in str(result.context.error)

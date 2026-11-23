@@ -4,8 +4,7 @@
 # Prefer installing through extras, e.g.:
 #
 #   pip install -e ".[test]"     # core + test tools
-#   pip install -e ".[sci]"      # core + scientific discovery
-#   pip install -e ".[full]"     # everything except dev/docs tooling
+#   pip install -e ".[full]"     # core + YAML config support
 #
 # This file intentionally stays small so `pip install -r requirements.txt`
 # always yields a working test environment.

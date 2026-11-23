@@ -17,7 +17,7 @@ class TestPipelineConfig:
         config = PipelineConfig()
         
         assert config.min_fitness_threshold == 0.0
-        assert config.enable_learning is True
+        assert config.enable_learning is False
         assert config.learning_rate == 0.01
         assert config.max_retries == 3
         assert config.raise_on_error is True

@@ -16,18 +16,23 @@ Modules | 模块:
 
 Example | 示例:
     >>> from metathin.agent import Metathin, MetathinBuilder
-    >>> from metathin.core import SimplePatternSpace
-    >>> from metathin.components import FunctionBehavior
     >>> 
+    >>> # Implement P, S and D yourself | 自行实现 P、S、D
     >>> # Method 1: Direct construction | 方法1：直接构造
-    >>> agent = Metathin(pattern_space=SimplePatternSpace(lambda x: [len(x)]))
-    >>> agent.register_behavior(FunctionBehavior("greet", lambda f,**k: "Hello"))
+    >>> agent = Metathin(
+    ...     pattern_space=MyPattern(),
+    ...     selector=MySelector(),
+    ...     decision_strategy=MyStrategy(),
+    ... )
+    >>> agent.register_behavior(my_behavior)
     >>> 
     >>> # Method 2: Builder pattern | 方法2：构建器模式
     >>> agent = (MetathinBuilder()
     ...     .with_name("MyAgent")
-    ...     .with_pattern_space(SimplePatternSpace(lambda x: [len(x)]))
-    ...     .with_behavior(FunctionBehavior("greet", lambda f,**k: "Hello"))
+    ...     .with_pattern_space(MyPattern())
+    ...     .with_behavior(my_behavior)
+    ...     .with_selector(MySelector())
+    ...     .with_decision_strategy(MyStrategy())
     ...     .build()
     ... )
     >>> 

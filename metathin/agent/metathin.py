@@ -18,20 +18,24 @@ Design Philosophy | 设计理念:
       向后兼容：保持与原始 API 的兼容性
 
 Example | 示例:
-    >>> from metathin.core import SimplePatternSpace
-    >>> from metathin.components import FunctionBehavior, MaxFitnessStrategy
+    >>> from metathin.agent import Metathin
     >>> 
-    >>> # Create components | 创建组件
-    >>> pattern = SimplePatternSpace(lambda x: [len(str(x))])
-    >>> greet = FunctionBehavior("greet", lambda f,**k: "Hello!")
+    >>> # Implement P, S and D yourself | 自行实现 P、S、D
+    >>> pattern = MyPattern()
+    >>> selector = MySelector()
+    >>> strategy = MyStrategy()
     >>> 
     >>> # Create agent | 创建代理
-    >>> agent = Metathin(pattern_space=pattern)
-    >>> agent.register_behavior(greet)
+    >>> agent = Metathin(
+    ...     pattern_space=pattern,
+    ...     selector=selector,
+    ...     decision_strategy=strategy,
+    ... )
+    >>> agent.register_behavior(my_behavior)
     >>> 
     >>> # Use agent | 使用代理
     >>> result = agent.think("world")
-    >>> print(result)  # "Hello!"
+    >>> print(result)
 """
 
 import logging
@@ -50,12 +54,6 @@ from ..core.exceptions import MetathinError, NoBehaviorError
 from ..engine import ThinkingPipeline, PipelineResult, ThinkingContext, HookManager
 from ..services import MemoryManager, HistoryTracker, MetricsCollector, ThoughtRecord
 from ..config import MetathinConfig, load_config
-
-# Import default components (lazy) | 导入默认组件（延迟）
-from ..components.pattern_space import SimplePatternSpace
-from ..components.selector import SimpleSelector
-from ..components.decision import MaxFitnessStrategy
-from ..components.learning import BehaviorFeedbackLearning
 
 
 # ============================================================
@@ -141,8 +139,13 @@ class Metathin:
         
         # P - Pattern Space | 模式空间
         if pattern_space is None:
-            # Default pattern space (extracts single feature: length) | 默认模式空间
-            pattern_space = SimplePatternSpace(lambda x: [float(len(str(x)))])
+            raise ValueError(
+                "pattern_space (P) is required; Metathin no longer ships a default implementation"
+            )
+        if not isinstance(pattern_space, PatternSpace):
+            raise TypeError(
+                f"pattern_space must implement PatternSpace, got {type(pattern_space)}"
+            )
         self.P: PatternSpace = pattern_space
         
         # B - Behaviors | 行为列表
@@ -150,19 +153,36 @@ class Metathin:
         
         # S - Selector | 选择器
         if selector is None:
-            # Default selector (simple linear) | 默认选择器（简单线性）
-            selector = SimpleSelector()
+            raise ValueError(
+                "selector (S) is required; Metathin no longer ships a default implementation"
+            )
+        if not isinstance(selector, Selector):
+            raise TypeError(
+                f"selector must implement Selector, got {type(selector)}"
+            )
         self.S: Selector = selector
         
         # D - Decision Strategy | 决策策略
         if decision_strategy is None:
-            decision_strategy = MaxFitnessStrategy()
+            raise ValueError(
+                "decision_strategy (D) is required; Metathin no longer ships a default implementation"
+            )
+        if not isinstance(decision_strategy, DecisionStrategy):
+            raise TypeError(
+                f"decision_strategy must implement DecisionStrategy, got {type(decision_strategy)}"
+            )
         self.D: DecisionStrategy = decision_strategy
         
         # Ψ - Learning Mechanism | 学习机制
+        if learning_mechanism is not None and not isinstance(learning_mechanism, LearningMechanism):
+            raise TypeError(
+                f"learning_mechanism must implement LearningMechanism, got {type(learning_mechanism)}"
+            )
         self.Ψ: Optional[LearningMechanism] = learning_mechanism
-        if learning_mechanism is None and self._config.pipeline.enable_learning:
-            self.Ψ = BehaviorFeedbackLearning(learning_rate=self._config.pipeline.learning_rate)
+        if self.Ψ is None and self._config.pipeline.enable_learning:
+            raise ValueError(
+                "learning is enabled but no learning_mechanism (Ψ) was provided"
+            )
         
         # ============================================================
         # Services (Lazy Initialization) | 服务（延迟初始化）
@@ -333,10 +353,10 @@ class Metathin:
         self._is_thinking = True
         self._thinking_count += 1
         
-        # Ensure services are initialized | 确保服务已初始化
-        self._ensure_services()
-        
         try:
+            # Ensure services are initialized | 确保服务已初始化
+            self._ensure_services()
+
             # Run pipeline | 运行流水线
             result = self._pipeline.run(
                 raw_input=raw_input,
@@ -786,8 +806,8 @@ class Metathin:
             path: File path | 文件路径
             pattern_space: Pattern space (required) | 模式空间（必需）
             behaviors: List of behaviors (required) | 行为列表（必需）
-            selector: Selector (optional) | 选择器（可选）
-            decision_strategy: Decision strategy (optional) | 决策策略（可选）
+            selector: Selector (required) | 选择器（必需）
+            decision_strategy: Decision strategy (required) | 决策策略（必需）
             learning_mechanism: Learning mechanism (optional) | 学习机制（可选）
             
         Returns | 返回:
@@ -805,6 +825,10 @@ class Metathin:
         
         if behaviors is None:
             raise ValueError("behaviors parameter must be provided")
+        if selector is None:
+            raise ValueError("selector parameter must be provided")
+        if decision_strategy is None:
+            raise ValueError("decision_strategy parameter must be provided")
         
         with open(path, 'rb') as f:
             data = pickle.load(f)

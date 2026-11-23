@@ -27,10 +27,14 @@ Design Philosophy | 设计理念:
 
 from __future__ import annotations
 
+import math
+import numbers
 import random
 import time
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
+
+import numpy as np
 
 from ..core.types import FeatureVector
 from ..core.p_pattern import PatternSpace
@@ -39,12 +43,14 @@ from ..core.s_selector import Selector
 from ..core.d_decision import DecisionStrategy
 from ..core.psi_learning import LearningMechanism
 from ..core.exceptions import (
+    MetathinError,
     PatternExtractionError,
     BehaviorExecutionError,
     FitnessComputationError,
     DecisionError,
     NoBehaviorError,
     LearningError,
+    ParameterUpdateError,
 )
 
 from .context import ThinkingContext, PerceiveResult, HypothesizeResult, DecideResult, ExecuteResult, LearnResult
@@ -164,12 +170,36 @@ class ThinkingPipeline:
             context_params=context_params or {},
         )
 
+        # Validate contracts before touching any component | 调用任何组件前先校验契约
+        try:
+            self._validate_contracts(
+                pattern_space, behaviors, selector, decision_strategy, learning_mechanism
+            )
+        except Exception as exc:  # noqa: BLE001 - convert to a pipeline failure
+            error = exc if isinstance(exc, MetathinError) else MetathinError(
+                f"component contract validation failed: {exc}"
+            )
+            return PipelineResult(
+                success=False,
+                result=None,
+                selected_behavior=None,
+                fitness_scores={},
+                stage_times=context.stage_times,
+                error=error,
+                context=context.with_error(error, 'contract'),
+            )
+
         # ============================================================
         # Stage 1: Perceive (P) | 阶段1：感知
         # ============================================================
         try:
             perceive_start = time.time()
             features = pattern_space.extract(raw_input)
+            if not pattern_space.validate_features(features):
+                raise PatternExtractionError(
+                    "PatternSpace.extract() must return a 1-D float64 numpy array "
+                    "with finite values"
+                )
             perceive_duration = time.time() - perceive_start
             context = context.with_stage_time('perceive', perceive_duration)
 
@@ -286,6 +316,13 @@ class ThinkingPipeline:
                 )
                 confidence = decision_strategy.get_confidence(
                     [fitness_scores[b.name] for b in candidates]
+                )
+
+            if not isinstance(selected, MetaBehavior) or not any(
+                selected is candidate for candidate in candidates
+            ):
+                raise DecisionError(
+                    "DecisionStrategy.select() must return one of the candidate behaviors"
                 )
             decide_duration = time.time() - decide_start
             context = context.with_stage_time('decide', decide_duration)
@@ -411,6 +448,119 @@ class ThinkingPipeline:
             context=context,
         )
 
+    def _validate_contracts(
+        self,
+        pattern_space: PatternSpace,
+        behaviors: List[MetaBehavior],
+        selector: Selector,
+        decision_strategy: DecisionStrategy,
+        learning_mechanism: Optional[LearningMechanism],
+    ) -> None:
+        """Validate the component contracts before running the pipeline."""
+        if not isinstance(pattern_space, PatternSpace):
+            raise MetathinError(
+                f"pattern_space must implement PatternSpace, got {type(pattern_space)}"
+            )
+        if not isinstance(selector, Selector):
+            raise MetathinError(
+                f"selector must implement Selector, got {type(selector)}"
+            )
+        if not isinstance(decision_strategy, DecisionStrategy):
+            raise MetathinError(
+                "decision_strategy must implement DecisionStrategy, "
+                f"got {type(decision_strategy)}"
+            )
+        if learning_mechanism is not None and not isinstance(
+            learning_mechanism, LearningMechanism
+        ):
+            raise MetathinError(
+                "learning_mechanism must implement LearningMechanism, "
+                f"got {type(learning_mechanism)}"
+            )
+        if not isinstance(behaviors, (list, tuple)):
+            raise MetathinError(
+                f"behaviors must be a list or tuple, got {type(behaviors)}"
+            )
+
+        names = []
+        for behavior in behaviors:
+            if not isinstance(behavior, MetaBehavior):
+                raise MetathinError(
+                    f"every behavior must implement MetaBehavior, got {type(behavior)}"
+                )
+            if not isinstance(behavior.name, str) or not behavior.name:
+                raise MetathinError("every behavior must have a non-empty string name")
+            names.append(behavior.name)
+        if len(names) != len(set(names)):
+            raise MetathinError("behavior names must be unique")
+
+    def _validate_fitness(self, behavior_name: str, fitness: Any) -> float:
+        """Validate and normalize a fitness score."""
+        if isinstance(fitness, bool) or not isinstance(fitness, numbers.Real):
+            raise FitnessComputationError(
+                f"Selector returned a non-numeric fitness for '{behavior_name}': "
+                f"{fitness!r}"
+            )
+        value = float(fitness)
+        if not math.isfinite(value):
+            raise FitnessComputationError(
+                f"Selector returned a non-finite fitness for '{behavior_name}': {value!r}"
+            )
+        if not 0.0 <= value <= 1.0:
+            raise FitnessComputationError(
+                f"Fitness for '{behavior_name}' must be in [0, 1], got {value!r}"
+            )
+        return value
+
+    def _validate_parameters(self, selector: Selector) -> Dict[str, float]:
+        """Read and validate selector parameters."""
+        parameters = selector.get_parameters()
+        return self._validate_parameter_mapping(parameters, "selector parameters")
+
+    def _validate_parameter_mapping(
+        self, mapping: Any, label: str
+    ) -> Dict[str, float]:
+        """Validate a parameter mapping returned by a component."""
+        if not isinstance(mapping, dict):
+            raise ParameterUpdateError(f"{label} must be a dict, got {type(mapping)}")
+        normalized: Dict[str, float] = {}
+        for key, value in mapping.items():
+            if not isinstance(key, str) or not key:
+                raise ParameterUpdateError(
+                    f"{label} keys must be non-empty strings, got {key!r}"
+                )
+            if isinstance(value, bool) or not isinstance(value, numbers.Real):
+                raise ParameterUpdateError(
+                    f"{label}['{key}'] must be numeric, got {value!r}"
+                )
+            number = float(value)
+            if not math.isfinite(number):
+                raise ParameterUpdateError(
+                    f"{label}['{key}'] must be finite, got {number!r}"
+                )
+            normalized[key] = number
+        return normalized
+
+    def _validate_adjustment(
+        self, selector: Selector, adjustment: Any
+    ) -> Optional[Dict[str, float]]:
+        """Validate an adjustment dictionary before applying it."""
+        if adjustment is None:
+            return None
+        if not isinstance(adjustment, dict):
+            raise LearningError(
+                f"compute_adjustment() must return a dict or None, got {type(adjustment)}"
+            )
+        normalized = self._validate_parameter_mapping(adjustment, "adjustment")
+        known = set(selector.get_parameters().keys())
+        unknown = sorted(set(normalized) - known)
+        if unknown:
+            raise LearningError(
+                f"compute_adjustment() returned unknown selector keys: {unknown}"
+            )
+        return normalized
+
+
     def _hypothesize(
         self,
         behaviors: List[MetaBehavior],
@@ -441,6 +591,7 @@ class ThinkingPipeline:
 
             # Compute fitness | 计算适应度
             fitness = selector.compute_fitness(behavior, features)
+            fitness = self._validate_fitness(behavior.name, fitness)
 
             # Record fitness for analysis | 记录适应度用于分析
             selector.record_fitness(behavior.name, fitness)
@@ -501,7 +652,7 @@ class ThinkingPipeline:
             'behavior_index': behavior_index,
             'expected_behavior_index': expected_behavior_index,
             'parameter_prefix': getattr(selector, 'parameter_prefix', 'w_'),
-            'parameters': selector.get_parameters(),
+            'parameters': self._validate_parameters(selector),
             'expected': expected,
             'actual': actual,
             'reward': reward,
@@ -509,22 +660,47 @@ class ThinkingPipeline:
 
         get_learning_features = getattr(selector, 'get_learning_features', None)
         if callable(get_learning_features):
-            context['features'] = get_learning_features(features)
+            learning_features = get_learning_features(features)
+            if not (
+                isinstance(learning_features, np.ndarray)
+                and learning_features.ndim == 1
+                and learning_features.dtype == np.float64
+                and learning_features.size > 0
+                and np.all(np.isfinite(learning_features))
+            ):
+                raise LearningError(
+                    "Selector.get_learning_features() must return a non-empty 1-D "
+                    "float64 numpy array with finite values"
+                )
+            context['features'] = learning_features
 
         # Compute adjustment | 计算调整量
-        adjustment = learning_mechanism.compute_adjustment(expected, actual, context)
+        adjustment = self._validate_adjustment(
+            selector,
+            learning_mechanism.compute_adjustment(expected, actual, context),
+        )
 
         # Apply adjustment if any | 如果有调整量则应用
         if adjustment:
             selector.update_parameters(adjustment)
 
-        # Optional post-update (e.g. Hebbian weight normalization)
+        # Optional post-update (e.g. weight normalization)
         if hasattr(learning_mechanism, 'post_update'):
-            mid = selector.get_parameters()
-            after = learning_mechanism.post_update(mid.copy())
+            mid = self._validate_parameters(selector)
+            post_result = learning_mechanism.post_update(mid.copy())
+            after = (
+                {}
+                if post_result is None
+                else self._validate_parameter_mapping(
+                    post_result, "post_update result"
+                )
+            )
             if after:
-                delta = {k: after[k] - mid.get(k, 0.0) for k in after
-                         if abs(after[k] - mid.get(k, 0.0)) > 1e-12}
+                delta = {
+                    k: after[k] - mid.get(k, 0.0)
+                    for k in after
+                    if abs(after[k] - mid.get(k, 0.0)) > 1e-12
+                }
                 if delta:
                     selector.update_parameters(delta)
 

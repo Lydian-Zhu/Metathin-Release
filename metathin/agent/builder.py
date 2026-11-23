@@ -15,14 +15,14 @@ Design Philosophy | 设计理念:
 
 Example | 示例:
     >>> from metathin.agent import MetathinBuilder
-    >>> from metathin.components import FunctionBehavior, MaxFitnessStrategy
     >>> 
     >>> agent = (MetathinBuilder()
     ...     .with_name("MyAgent")
     ...     .with_pattern_space(MyPattern())
     ...     .with_behavior(greet_behavior)
     ...     .with_behavior(echo_behavior)
-    ...     .with_decision_strategy(MaxFitnessStrategy())
+    ...     .with_selector(MySelector())
+    ...     .with_decision_strategy(MyStrategy())
     ...     .with_config(MetathinConfig.create_production())
     ...     .build()
     ... )
@@ -449,6 +449,10 @@ class MetathinBuilder:
         # Validate required components | 验证必需组件
         if self._pattern_space is None:
             raise ValueError("Pattern space (P) is required. Call .with_pattern_space()")
+        if self._selector is None:
+            raise ValueError("Selector (S) is required. Call .with_selector()")
+        if self._decision_strategy is None:
+            raise ValueError("Decision strategy (D) is required. Call .with_decision_strategy()")
         
         # Build configuration | 构建配置
         config = self._build_config()

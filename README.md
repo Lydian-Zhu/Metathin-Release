@@ -1,318 +1,170 @@
 # Metathin
 
-**A Meta-cognitive Agent System Construction Framework**
+**An interface-first framework for constructing meta-cognitive agents.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Lydian-Zhu/Metathin-Release/pulls)
 
----
-
-## What is Metathin?
-
-Metathin is a framework for building cognitive agents based on a five-tuple structure `(P, B, S, D, Ψ)`. It provides a clean, modular, and extensible foundation for creating intelligent systems.
-
-**Design Philosophy:**  
-- **Fixed Interface, Free Implementation** – You bring your own algorithms  
-- **Modular & Composable** – Plug and play components  
-- **Type Safe & Observable** – Built with type hints and full logging
-
-I started this project for my physics experiment data processing, and later realized it could become something more general. Now it's here, hope it helps.
-
----
-
-## The Core Idea
-
-No matter what kind of agent you're building—a chatbot, a lab assistant, or a prediction model—its thinking process can be described with five elements:
+Metathin describes an agent as a five-tuple:
 
 ```
 Metathin = (P, B, S, D, Ψ)
 ```
 
-- **P (PatternSpace)** – Perception: turns raw input into feature vectors  
-- **B (MetaBehavior)** – Action: executable skill units  
-- **S (Selector)** – Evaluation: computes how suitable each behavior is  
-- **D (DecisionStrategy)** – Decision: picks the best behavior  
-- **Ψ (LearningMechanism)** – Learning: adjusts parameters from feedback  
+- **P — PatternSpace**: turns raw input into a feature vector.
+- **B — MetaBehavior**: an executable skill.
+- **S — Selector**: scores each behavior's fitness.
+- **D — DecisionStrategy**: chooses a behavior from the candidates.
+- **Ψ — LearningMechanism**: adjusts selector parameters from feedback.
 
-This abstraction doesn't care about what AI technology you use underneath. It just works.
+This repository deliberately ships **interfaces and orchestration only**. It
+does not include built-in selectors, learners, decision strategies, or domain
+modules. You bring the algorithms; Metathin owns the contracts, lifecycle,
+validation, history, metrics, and memory plumbing.
 
 ---
 
-## Built-in Components? Optional.
+## What is in the box
 
-Metathin comes with 30+ pre-built components (`SimplePatternSpace`, `MaxFitnessStrategy`, `GradientLearning`...). **But you don't have to use them.**
+- The five interfaces and their type/exception contracts.
+- The thinking pipeline (`P → S → D → B → Ψ`) with strict runtime validation.
+- Configuration loading and validation.
+- Optional memory, history, and metrics services.
+- A facade and fluent builder that require every core component to be injected.
 
-The framework's real value is in the **interfaces**:
+**Not in the box:**
+
+- concrete `PatternSpace`, `Selector`, `LearningMechanism` implementations;
+- concrete decision strategies or behavior wrappers;
+- `metathin.components`;
+- `metathin_plus` / the old `sci` module and its optional scientific stack.
+
+This is a deliberate breaking change. The framework is meant to be a stable
+core that applications and third-party packages build on.
+
+---
+
+## Quick start
+
+Every component is supplied by you. The smallest working agent looks like this:
 
 ```python
-from metathin.core import PatternSpace, MetaBehavior, Selector, DecisionStrategy, LearningMechanism
-```
+import numpy as np
 
-You can:
-
-- Use what I provide (quick start)
-- Implement your own algorithms (full control)
-- Mix and match (bring your own Selector, use my Behaviors)
-
-The interfaces are designed to be minimal and flexible. They don't force you into any specific implementation. You bring your domain expertise, the framework handles the orchestration.
-
-## AI? Feel Free to Ask It
-
-The project structure is clean, the interfaces are well-documented, and the type hints are everywhere. If you paste this code into an AI assistant and say "Help me implement a custom Selector for my problem", it'll probably know what to do. I've designed it that way on purpose.
-
-## Project Structure (Refactored)
-
-```
-metathin/                    # Core framework
-├── core/                   # Five-element interfaces (P, B, S, D, Ψ)
-│   ├── p_pattern.py       # PatternSpace interface
-│   ├── b_behavior.py      # MetaBehavior interface
-│   ├── s_selector.py      # Selector interface
-│   ├── d_decision.py      # DecisionStrategy interface
-│   ├── psi_learning.py    # LearningMechanism interface
-│   └── memory_backend.py  # Storage backend interface
-├── engine/                 # Thinking pipeline
-│   ├── pipeline.py        # Pure function cognitive cycle
-│   ├── context.py         # State container
-│   └── hooks.py           # Extension points
-├── services/               # Optional services
-│   ├── memory_manager.py  # Two-tier caching
-│   ├── history_tracker.py # Thought history
-│   └── metrics_collector.py # Performance metrics
-├── config/                 # Configuration system
-│   ├── schema.py          # Config data structures
-│   └── loader.py          # Load from file/env
-├── agent/                  # Facade & builder
-│   ├── metathin.py        # Main agent class
-│   └── builder.py         # Fluent builder
-└── components/             # Built-in implementations
-    ├── pattern_space.py   # 5+ feature extractors
-    ├── behavior_library.py # 7+ behavior wrappers
-    ├── selector.py        # 5+ fitness calculators
-    ├── decision.py        # 7+ decision strategies
-    └── learning.py        # 5+ learning mechanisms
-
-metathin_plus/              # Domain extensions
-└── sci/                   # Scientific discovery
-```
-
-Each file name tells you what it does – `p_pattern.py` = Pattern Space, `b_behavior.py` = Behavior, etc.
-
----
-
-## What Makes Metathin Different?
-
-### Memory Built-in, Not Bolted-on
-
-Most frameworks treat memory as an afterthought. In Metathin, it's built into the core from day one.
-
-Every agent comes with a complete memory system:
-
-- **Two-tier architecture:** Fast in-memory cache + persistent backend
-- **Multiple backends:** JSON (human-readable), SQLite (production), in-memory (testing) – swap them anytime
-- **Smart management:** LRU eviction when cache fills up, TTL (time-to-live) for auto-expiring items
-- **Every component can use it:** Behaviors can remember outcomes, Selectors can recall past fitness, Learning mechanisms can store experiences
-
-### RL-ready, but not RL-only
-
-The five-tuple structure maps naturally to reinforcement learning:
-
-- P = state representation
-- B = action space
-- S = value function
-- D = policy
-- Ψ = update rule
-
-But swap in a supervised Selector and a gradient-based Learner, and you're doing supervised learning. Swap in Hebbian learning with no expected output, and you're doing unsupervised learning.
-
-Same architecture. Different components. Three paradigms.
-
-### Clean, Layered Architecture
-
-The refactored codebase is organized into clear layers:
-
-- **Core** – Pure interfaces, no dependencies
-- **Engine** – Pure function pipeline, stateless
-- **Services** – Optional, injectable
-- **Config** – Separate from logic
-- **Agent** – Facade that assembles everything
-- **Components** – Concrete implementations
-
-This makes the code easy to understand, test, and extend.
-
----
-
-## Quick Start
-
-```python
 from metathin import Metathin, MetathinBuilder
-from metathin.components import SimplePatternSpace, FunctionBehavior, MaxFitnessStrategy
-
-# Define behaviors
-greet = FunctionBehavior("greet", lambda f,**k: "Hello! I'm an agent, how can I help?")
-echo = FunctionBehavior("echo", lambda f,**k: f"You just said: {k.get('user_input', '')}")
-
-# Build agent (builder pattern)
-agent = (MetathinBuilder()
-    .with_pattern_space(SimplePatternSpace(lambda x: [len(x)]))
-    .with_behaviors([greet, echo])
-    .with_decision_strategy(MaxFitnessStrategy())
-    .with_name("SimpleAgent")
-    .build())
-
-# Or use direct constructor
-agent = Metathin(
-    pattern_space=SimplePatternSpace(lambda x: [len(x)]),
-    decision_strategy=MaxFitnessStrategy(),
-    name="SimpleAgent"
+from metathin.core import (
+    DecisionStrategy,
+    FeatureVector,
+    FitnessScore,
+    MetaBehavior,
+    PatternSpace,
+    Selector,
 )
-agent.register_behaviors([greet, echo])
 
-# Chat
-print("Agent started, type 'quit' to exit")
-while True:
-    user_input = input("\nYou: ")
-    if user_input.lower() == 'quit':
-        break
-    
-    response = agent.think(user_input, user_input=user_input)
-    print(f"Agent: {response}")
+
+class TextFeatures(PatternSpace[str]):
+    def extract(self, raw_input: str) -> FeatureVector:
+        return np.array([len(raw_input), len(raw_input.split())], dtype=np.float64)
+
+    def get_feature_names(self):
+        return ["chars", "words"]
+
+
+class Greet(MetaBehavior[str]):
+    @property
+    def name(self) -> str:
+        return "greet"
+
+    def execute(self, features: FeatureVector, **kwargs) -> str:
+        return f"Hello! ({int(features[0])} chars)"
+
+
+class Echo(MetaBehavior[str]):
+    @property
+    def name(self) -> str:
+        return "echo"
+
+    def execute(self, features: FeatureVector, **kwargs) -> str:
+        return kwargs.get("user_input", "")
+
+
+class LengthSelector(Selector):
+    """Prefer behaviors that suit longer inputs; purely illustrative."""
+
+    def compute_fitness(self, behavior: MetaBehavior, features: FeatureVector) -> FitnessScore:
+        if behavior.name == "greet":
+            return 0.8 if features[0] < 20 else 0.2
+        return 0.5
+
+
+class Greedy(DecisionStrategy):
+    def select(self, behaviors, fitness_scores, features):
+        return behaviors[max(range(len(fitness_scores)), key=fitness_scores.__getitem__)]
+
+
+agent = (
+    MetathinBuilder()
+    .with_name("Demo")
+    .with_pattern_space(TextFeatures())
+    .with_behaviors([Greet(), Echo()])
+    .with_selector(LengthSelector())
+    .with_decision_strategy(Greedy())
+    .build()
+)
+
+print(agent.think("hello world", user_input="hello world"))
 ```
 
-Run it. It works.
-
----
-
-## Configuration Examples
+Learning is opt-in. Pass a `LearningMechanism` and set `enable_learning=True`:
 
 ```python
-from metathin.config import MetathinConfig, MemoryConfig, ObservabilityConfig
+from metathin.config import MetathinConfig, PipelineConfig
 
-# Minimal config (no memory, no history)
-config = MetathinConfig.create_minimal()
-
-# Production config (SQLite memory, full observability)
-config = MetathinConfig.create_production("MyAgent")
-
-# Custom config
-config = MetathinConfig(
-    memory=MemoryConfig(enabled=True, backend_type='sqlite'),
-    observability=ObservabilityConfig(keep_history=True, enable_metrics=True)
+agent = Metathin(
+    pattern_space=TextFeatures(),
+    selector=LengthSelector(),
+    decision_strategy=Greedy(),
+    learning_mechanism=MyLearner(),   # a LearningMechanism implementation
+    config=MetathinConfig(pipeline=PipelineConfig(enable_learning=True)),
 )
 ```
 
----
-
-## Built-in Modules (To Get You Started)
-
-### Scientific Discovery (`metathin_plus.sci`)
-
-For finding patterns and laws from data:
-
-- Symbolic regression engine
-- Feature extraction (30+ features)
-- Similarity matching with pre-trained function libraries
-- Adaptive extrapolation
-
-If you work with experimental data—chemistry, biology, materials science—this might save you time.
-
-### The Sci Module? Also Customizable
-
-`metathin_plus.sci` follows the same philosophy:
-
-- Use the built-in function generator, feature extractor, and similarity matcher
-- OR implement your own discovery algorithms
-- OR extend the existing ones
-
-The memory system (`FunctionMemoryBank`) is pluggable. The extrapolator is adaptable. Nothing is locked down.
-
-**This is your framework. Use it how you want.**
+If learning is enabled without a mechanism, construction fails instead of
+silently doing nothing.
 
 ---
 
-## This is Where You Come In
+## Core contracts
 
-Metathin's core is intentionally minimal. The real power comes from you adding modules for your own field.
+`ThinkingPipeline` validates the following at runtime:
 
-**If You're in Physics/Chemistry/Biology**  
-Add to `metathin_plus.sci`:
-- New scientific discovery algorithms
-- Domain-specific function libraries
-- Pattern discovery examples from your own data
+- `P`, `S`, `D` and `Ψ` must implement their respective interfaces.
+- Every behavior must be a `MetaBehavior` with a unique, non-empty name.
+- `PatternSpace.extract()` must return a 1-D `float64` NumPy array with finite values.
+- `Selector.compute_fitness()` must return a finite `float` in `[0, 1]`.
+- `DecisionStrategy.select()` must return one of the candidates it was given.
+- Selector parameters and learning adjustments must be finite numeric mappings;
+  learning may only touch keys that `get_parameters()` exposes.
+- Invalid learning output is recorded on the thought context; it never corrupts
+  the selector or crashes the thought.
 
-**If You're in Economics**  
-Create `metathin_plus.econ`:
-- Market prediction models
-- Agent-based economic simulations
-- Time series forecasting for financial data
-
-**If You're in Neuroscience**  
-Create `metathin_plus.neuro`:
-- Neural spike train analysis
-- Brain-computer interface components
-- Cognitive modeling tools
-
-**If You're in Climate Science**  
-Create `metathin_plus.climate`:
-- Weather prediction models
-- Climate pattern analysis
-- Ensemble forecasting
-
-You get the idea. Any domain that involves data, patterns, and decision-making can build on Metathin.
+This means a buggy custom component produces a clear `PatternExtractionError`,
+`FitnessComputationError`, `DecisionError`, or `LearningError` instead of a
+silently wrong result.
 
 ---
 
-## Why Contribute?
+## What is preserved
 
-- Your work gets used – by researchers, students, and practitioners in your field
-- You stand on shoulders – the core framework handles the boring stuff, you focus on domain logic
-- It's good for your CV – open source contributions matter
-- It's actually fun – seeing your code help other people is satisfying
+- **Memory**: JSON, SQLite and in-memory backends, TTL and LRU caching.
+- **History**: bounded thought records, success/failure filtering, export.
+- **Metrics**: windowed timing and behavior-usage summaries.
+- **Configuration**: dataclass validation plus file/dict/environment loading.
+- **Builder**: explicit dependency injection, validation, and config overrides.
 
-## How to Add Your Own Module
-
-1. Fork the repo
-2. Create `metathin_plus/your_module/`
-3. Implement your components (they just need to follow the core interfaces)
-4. Add a few examples so people know how to use it
-5. Open a PR
-
-That's it. No permission needed. If your module is useful, it gets merged. If it's experimental, we can mark it as such. The goal is to let people share.
-
----
-
-## Current Status (v0.4.0)
-
-**What works:**
-
-✅ Core five-element architecture (refactored)  
-✅ All built-in components (30+)  
-✅ Memory system (JSON/SQLite/in-memory backends, TTL, LRU)  
-✅ Thinking pipeline with hooks  
-✅ Configuration system (file/env/dict)  
-✅ Builder pattern for easy agent creation  
-✅ Scientific discovery module  
-✅ 492+ unit tests passing
-
-**Under the hood, Metathin already supports:**
-
-✅ Supervised learning (via GradientLearning + expected)  
-✅ Unsupervised learning (via HebbianLearning)  
-✅ Reinforcement learning (via RewardLearning + exploration strategies)  
-✅ Time series forecasting (with built-in memory for history)
-
-**What's in progress:**
-
-⚠️ User manual is being written  
-⚠️ More examples and tutorials  
-⚠️ Performance optimizations
-
----
-
-## Why not on PyPI yet?
-
-I want to get more feedback first, make sure the API feels right. Once stable, it'll be there.
+These are infrastructure, not algorithm implementations. They remain because
+the core needs them to be observable and testable.
 
 ---
 
@@ -322,46 +174,50 @@ I want to get more feedback first, make sure the API feels right. Once stable, i
 # Core only
 pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git
 
-# With scientific discovery
-pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[sci]
+# With YAML configuration support
+pip install "metathin[yaml] @ git+https://github.com/Lydian-Zhu/Metathin-Release.git"
 
-# Everything
-pip install git+https://github.com/Lydian-Zhu/Metathin-Release.git#egg=metathin[full]
+# Test tools / contributor tools
+pip install -e ".[test]"
+pip install -e ".[dev]"
 ```
 
-Dependencies are grouped, so you only install what you need.
+Runtime dependency: `numpy`. Python 3.8+.
 
 ---
 
-## How to Contribute (Even Without Code)
+## Project structure
 
-- **Star the repo** – lets me know someone cares
-- **Open an issue** – found a bug? have an idea?
-- **Improve docs** – fix typos, add explanations
-- **Write examples** – show how you use it in your field
-- **Tell people** – share it with your lab, your students, your Twitter followers
+```
+metathin/
+├── core/       # P, B, S, D, Ψ interfaces, types, exceptions, memory backend
+├── engine/     # thinking pipeline, context, hooks
+├── services/   # memory manager, history tracker, metrics collector
+├── config/     # schema, loader
+└── agent/      # Metathin facade and MetathinBuilder
+tests/          # interface, pipeline, config, service, and facade tests
+```
+
+No `components/` package exists. If you want reusable implementations, publish
+them as a separate package that depends on this core.
 
 ---
 
-## The Vision
+## Status
 
-A growing collection of domain-specific modules, all built on the same core framework. A physicist's tools, a chemist's reaction kinetics, an economist's market models—all accessible through the same clean API.
+- Core interfaces and pipeline: complete.
+- Runtime contract validation: enforced.
+- Concrete algorithms and the former `sci` module: removed in `0.5.0`.
+- Test suite: see CI for the current count; the suite uses only local test
+  doubles under `tests/helpers.py`.
 
-Is that ambitious? Yes.  
-Can we build it together? Also yes.
+The old `BehaviorFeedbackLearning`, `SimpleSelector`, `GradientLearning`,
+`ScientificMetathin` and related classes are intentionally no longer part of
+this distribution. They remain in the git history on earlier branches if you
+need to recover an implementation.
 
 ---
 
 ## License
 
-MIT – do what you want, just don't blame me if it breaks.
-
----
-
-## Acknowledgements
-
-Started from my own experimental data needs. If you find it useful, great. If you want to build it together, even better.
-
-If you like it, star it. If you want to help, PR it. If you have ideas, issue it. If you want to add your own module, just do it.
-
-**Questions? Suggestions?** Find me at lydianzhu@gmail.com
+MIT.
